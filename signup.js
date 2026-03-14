@@ -1,8 +1,6 @@
 // User signup logic for Plant QR
 (function () {
-  var API_URL = (function () {
-    var host = window.location.hostname || "localhost";
-    return "http://" + host + ":3001";
+  var API_URL = "https://plant-qr-website-production.up.railway.app";
   })();
 
   function get(id) {
