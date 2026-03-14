@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User feedback - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>User Portal</p>
+        <div class="user-badge"><span class="user-role-icon">U</span><span class="user-name">User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link active"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="card">
+          <div class="page-header" style="margin-bottom:24px;">
+            <div>
+              <h1>User feedback</h1>
+              <p>Share your feedback to help us improve the Plant QR system.</p>
+            </div>
+          </div>
+          <form id="feedbackForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fbName">Your name</label>
+                <input type="text" id="fbName" name="name" class="form-control" placeholder="Your name" />
+              </div>
+              <div class="form-group">
+                <label for="fbEmail">Email</label>
+                <input type="email" id="fbEmail" name="email" class="form-control" placeholder="your@email.com" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="fbPhone">Phone (optional)</label>
+              <input type="tel" id="fbPhone" name="phone" class="form-control" placeholder="+1 234 567 8900" />
+            </div>
+            <div class="form-group">
+              <label for="fbMessage">Your feedback <span class="required">*</span></label>
+              <textarea id="fbMessage" name="message" class="form-control" rows="5" placeholder="Tell us what you think..." required></textarea>
+            </div>
+            <div id="feedbackMsg" style="display:none;margin-bottom:16px;"></div>
+            <button type="submit" class="btn btn-primary">Submit feedback</button>
+          </form>
+
+          <div id="adminReplies" style="margin-top:32px;">
+            <h2 style="font-size:1.2rem;margin-bottom:16px;">Admin Replies</h2>
+            <div id="repliesList"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
+      var API = (function () {
+        var host = window.location.hostname || "localhost";
+        return "http://" + host + ":3001";
+      })();
+      function loadReplies() {
+        var email = document.getElementById("fbEmail").value.trim();
+        var phone = document.getElementById("fbPhone").value.trim() || (window.userPhone || "");
+        if (!email && !phone) {
+          document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your email or phone to see admin replies.</p>";
+          return;
+        }
+        var url = API + "/api/my-messages?type=feedback";
+        if (email) url += "&email=" + encodeURIComponent(email);
+        if (phone) url += "&phone=" + encodeURIComponent(phone);
+        fetch(url)
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var replies = (data || []).filter(function (m) { return m.adminReply; });
+            var list = document.getElementById("repliesList");
+            if (replies.length === 0) {
+              list.innerHTML = "<p style=\"color:#666;\">No admin replies yet.</p>";
+              return;
+            }
+            list.innerHTML = replies.map(function (msg) {
+              var date = new Date(msg.at).toLocaleString();
+              var replyDate = new Date(msg.repliedAt).toLocaleString();
+              return "<div class=\"card\" style=\"margin-bottom:12px;padding:15px;\">" +
+                "<div style=\"margin-bottom:10px;\"><strong>Your Message:</strong><p style=\"margin:5px 0;color:#666;\">" + escapeHtml(msg.message) + "</p><small style=\"color:#999;\">Sent: " + date + "</small></div>" +
+                "<div style=\"padding:12px;background:#e8f5e9;border-left:3px solid #2d8659;border-radius:4px;\"><strong>Admin Reply:</strong><p style=\"margin:5px 0;\">" + escapeHtml(msg.adminReply) + "</p><small style=\"color:#666;\">Replied: " + replyDate + "</small></div>" +
+                "</div>";
+            }).join("");
+          })
+          .catch(function () {
+            document.getElementById("repliesList").innerHTML = "<p style=\"color:#e74c3c;\">Could not load replies.</p>";
+          });
+      }
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        var d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+
+      if (window.userName) document.getElementById("fbName").value = window.userName;
+      if (window.userPhone) document.getElementById("fbPhone").value = window.userPhone;
+      loadReplies();
+
+      document.getElementById("fbEmail").addEventListener("blur", loadReplies);
+      document.getElementById("fbPhone").addEventListener("blur", loadReplies);
+
+      document.getElementById("feedbackForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var msgEl = document.getElementById("feedbackMsg");
+        var btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        fetch(API + "/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("fbName").value.trim(),
+            email: document.getElementById("fbEmail").value.trim(),
+            phone: document.getElementById("fbPhone").value.trim(),
+            message: document.getElementById("fbMessage").value.trim()
+          })
+        }).then(function (r) { return r.json(); })
+          .then(function (data) {
+            msgEl.style.display = "block";
+            if (data.error) {
+              msgEl.className = "error-message";
+              msgEl.textContent = data.error;
+            } else {
+              msgEl.className = "otp-success";
+              msgEl.textContent = data.message || "Thank you for your feedback.";
+              document.getElementById("feedbackForm").reset();
+              setTimeout(loadReplies, 500);
+            }
+            btn.disabled = false;
+          })
+          .catch(function () {
+            msgEl.style.display = "block";
+            msgEl.className = "error-message";
+            msgEl.textContent = "Could not submit. Is the server running?";
+            btn.disabled = false;
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

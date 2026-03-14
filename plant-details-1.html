@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mango Tree - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="plant-details">
+          <div class="page-header">
+            <div>
+              <a href="plants.html" class="back-link">← Back to Plants</a>
+              <h1>Mango Tree</h1>
+              <p class="scientific-name">Mangifera indica</p>
+            </div>
+            <div class="header-actions">
+              <a href="edit-plant.html?id=1" class="btn btn-outline admin-only">Edit</a>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="main-info card">
+              <div class="card-header">
+                <h2>Plant Information</h2>
+                <span class="badge badge-active">Active</span>
+              </div>
+              <div class="info-section">
+                <div class="info-row"><span class="info-label">Location:</span><span class="info-value">Orchard Section 1</span></div>
+                <div class="info-row"><span class="info-label">🌍 Coordinates:</span><span class="info-value">—</span></div>
+                <div class="info-row"><span class="info-label">🎂 Age:</span><span class="info-value">6 years (bearing stage)</span></div>
+                <div class="info-row"><span class="info-label">Date Added:</span><span class="info-value">2026-03-05</span></div>
+                <div class="info-row" id="mapLinkRow" style="display:none;">
+                  <span class="info-label">Map:</span>
+                  <span class="info-value">
+                    <a id="mapLink" href="#" target="_blank" rel="noopener">View on Google Maps</a>
+                  </span>
+                </div>
+              </div>
+              <div class="description-section">
+                <h3>Description</h3>
+                <p>
+                  The mango tree (<em>Mangifera indica</em>) is an evergreen <strong>fruit tree</strong>
+                  that grows best in warm, tropical and subtropical climates. It has a dense, rounded canopy
+                  and leathery dark-green leaves, and produces sweet, aromatic fruits rich in vitamins A and C.
+                  Mango trees perform best in deep, well-drained loamy soil and do not tolerate frost or
+                  prolonged cold conditions.
+                </p>
+              </div>
+              <div class="care-section">
+                <h3>Care Information</h3>
+                <h4>Ideal Growing Conditions</h4>
+                <ul>
+                  <li><strong>Climate:</strong> Tropical and subtropical; frost free.</li>
+                  <li><strong>Temperature:</strong> 24–30&nbsp;°C for best growth and fruiting.</li>
+                  <li><strong>Sunlight:</strong> Full sun with at least 6–8 hours of direct light daily.</li>
+                  <li><strong>Soil:</strong> Deep, well-drained loamy soil with pH 5.5–7.5.</li>
+                </ul>
+                <h4>Water Requirement</h4>
+                <ul>
+                  <li>Young plants: water regularly every 3–4 days in summer to keep soil slightly moist.</li>
+                  <li>Mature trees: moderate watering; can tolerate short dry periods.</li>
+                  <li>Avoid overwatering and waterlogging to prevent root rot.</li>
+                  <li>Increase irrigation during flowering and fruit development, then reduce before harvest for better fruit quality.</li>
+                </ul>
+                <h4>Common Diseases</h4>
+                <ul>
+                  <li><strong>Powdery mildew:</strong> White powdery growth on flowers and leaves; reduces fruit set.</li>
+                  <li><strong>Anthracnose:</strong> Black spots on leaves and fruits, especially in humid weather.</li>
+                  <li><strong>Mango malformation:</strong> Abnormally formed flower clusters and poor fruiting.</li>
+                </ul>
+                <h4>Pests</h4>
+                <ul>
+                  <li><strong>Mango hopper:</strong> Sucks sap from tender leaves and flowers.</li>
+                  <li><strong>Fruit fly:</strong> Lays eggs in ripening fruits, causing internal damage and rot.</li>
+                  <li><strong>Mealybugs:</strong> Produce sticky honeydew that can lead to sooty mold on leaves and stems.</li>
+                </ul>
+                <h4>Symptoms of Poor Health</h4>
+                <ul>
+                  <li>Yellowing or spotted leaves.</li>
+                  <li>Premature flower or fruit drop.</li>
+                  <li>Fruit rotting or black patches on the skin.</li>
+                  <li>Wilting, slow growth, or weak canopy development.</li>
+                </ul>
+                <h4>Preventive Care</h4>
+                <ul>
+                  <li>Prune dead, diseased, and crowded branches annually to improve light and air circulation.</li>
+                  <li>Maintain orchard sanitation by removing fallen leaves, diseased twigs, and dropped fruits.</li>
+                  <li>Apply recommended fungicides during flowering season in areas prone to disease.</li>
+                  <li>Ensure proper spacing between trees to reduce humidity and disease spread.</li>
+                  <li>Use neem oil or other eco-friendly sprays early in the season for basic pest management.</li>
+                </ul>
+                <h4>Fertilizer Recommendation</h4>
+                <ul>
+                  <li>Apply well-decomposed farmyard manure or compost around the tree every year.</li>
+                  <li>Use a balanced NPK fertilizer (10:10:10 or 12:12:12) according to the tree’s age and size.</li>
+                  <li>Split nitrogen applications: once before flowering and again after fruit set.</li>
+                  <li>Where needed, supply micronutrients such as zinc and boron to improve fruit set and quality.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      var API = (function () {
+        var host = window.location.hostname || "localhost";
+        return "http://" + host + ":3001";
+      })();
+      var PLANT_ID = 1;
+
+      function setText(selector, value) {
+        if (!value) return;
+        var el = document.querySelector(selector);
+        if (el) el.textContent = value;
+      }
+
+      function setInfo(labelText, value) {
+        if (value == null || value === "") return;
+        var rows = document.querySelectorAll(".info-section .info-row");
+        for (var i = 0; i < rows.length; i++) {
+          var lbl = rows[i].querySelector(".info-label");
+          if (!lbl) continue;
+          if (lbl.textContent.indexOf(labelText) !== -1) {
+            var valEl = rows[i].querySelector(".info-value");
+            if (valEl) valEl.textContent = value;
+            break;
+          }
+        }
+      }
+
+      fetch(API + "/api/plants/" + PLANT_ID)
+        .then(function (r) { return r.json(); })
+        .then(function (p) {
+          if (!p || p.error) return;
+          setText(".plant-details .page-header h1", p.name || "Mango Tree");
+          setText(".plant-details .page-header .scientific-name", p.scientificName || "Mangifera indica");
+          setInfo("Location", p.location);
+          setInfo("Coordinates", p.coordinates);
+          setInfo("Age", p.age);
+          setInfo("Date Added", p.dateAdded);
+          if (p.description) {
+            var desc = document.querySelector(".description-section p");
+            if (desc) desc.textContent = p.description;
+          }
+
+          // Map link for location / coordinates
+          var mapRow = document.getElementById("mapLinkRow");
+          var mapLink = document.getElementById("mapLink");
+          if (mapRow && mapLink) {
+            var query = (p.coordinates && p.coordinates.trim()) || (p.location && p.location.trim()) || (p.name && p.name.trim());
+            if (query) {
+              var url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+              mapLink.href = url;
+              mapRow.style.display = "";
+            } else {
+              mapRow.style.display = "none";
+            }
+          }
+        })
+        .catch(function () {
+          // ignore – page will show default static content
+        });
+    })();
+  </script>
+</body>
+</html>

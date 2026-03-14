@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link active"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="profile">
+          <div class="page-header">
+            <div>
+              <h1>Profile Settings</h1>
+              <p>Manage your account information and preferences</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-edit-profile">Edit Profile</button>
+            <span id="edit-actions" style="display: none;">
+              <button type="button" class="btn btn-primary" id="btn-save-profile">Save</button>
+              <button type="button" class="btn btn-outline" id="btn-cancel-edit">Cancel</button>
+            </span>
+          </div>
+
+          <div class="profile-content">
+            <div class="profile-main">
+              <div class="profile-card card">
+                <div class="profile-header">
+                  <div class="avatar"><span class="avatar-icon"></span></div>
+                  <div class="profile-info">
+                    <h2 id="profile-name">Admin User</h2>
+                    <p class="role" id="profile-role">Administrator</p>
+                    <p class="organization">Plant QR System</p>
+                  </div>
+                </div>
+
+                <div class="profile-form">
+                  <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Full Name</label>
+                        <div class="form-value" id="profile-fullname">Admin User</div>
+                        <input type="text" id="edit-fullname" class="form-control form-edit" style="display: none;" placeholder="Full name" />
+                      </div>
+                      <div class="form-group">
+                        <label>Email Address</label>
+                        <div class="form-value" id="profile-email">admin@plantqr.com</div>
+                        <input type="email" id="edit-email" class="form-control form-edit" style="display: none;" placeholder="Email address" />
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Phone Number</label>
+                        <div class="form-value" id="profile-phone">+1 (555) 123-4567</div>
+                        <input type="tel" id="edit-phone" class="form-control form-edit" style="display: none;" placeholder="Phone number" />
+                      </div>
+                      <div class="form-group">
+                        <label>Organization</label>
+                        <div class="form-value">Plant QR System</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-section">
+                    <h3>Account Information</h3>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Role</label>
+                        <div class="form-value" id="profile-role-value">Administrator</div>
+                      </div>
+                      <div class="form-group">
+                        <label>Joined Date</label>
+                        <div class="form-value">2024-01-01</div>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Last Login</label>
+                        <div class="form-value">2024-01-20 14:30</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

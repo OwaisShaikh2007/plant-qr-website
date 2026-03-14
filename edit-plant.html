@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Plant - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="add-plant">
+          <div class="page-header">
+            <div>
+              <h1 id="editPlantTitle">Edit Plant</h1>
+              <p id="editPlantSubtitle">Update the plant information and save your changes.</p>
+            </div>
+            <a href="plants.html" class="btn btn-outline">← Cancel</a>
+          </div>
+
+          <div class="form-container">
+            <div id="editError" class="error-message" style="display:none;"></div>
+            <form id="editPlantForm" class="plant-form card" style="display:none;">
+              <div class="form-section">
+                <h2>Basic Information</h2>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="name">Plant Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="scientificName">Scientific Name <span class="required">*</span></label>
+                    <input type="text" id="scientificName" name="scientificName" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="location">Location <span class="required">*</span></label>
+                    <input type="text" id="location" name="location" class="form-control" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="coordinates">Coordinates</label>
+                    <input type="text" id="coordinates" name="coordinates" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="text" id="age" name="age" class="form-control" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h2>Additional Information</h2>
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="careInfo">Care Information</label>
+                  <textarea id="careInfo" name="careInfo" class="form-control" rows="4"></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <a href="plants.html" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
+      var API = (function () {
+        var host = window.location.hostname || "localhost";
+        return "http://" + host + ":3001";
+      })();
+
+      function getPlantId() {
+        var params = new URLSearchParams(window.location.search || "");
+        var id = parseInt(params.get("id"), 10);
+        return isNaN(id) ? null : id;
+      }
+
+      function showError(message) {
+        var el = document.getElementById("editError");
+        if (!el) return;
+        el.textContent = message || "Something went wrong.";
+        el.style.display = "block";
+      }
+
+      function getDetailsPage(id) {
+        if (id === 1) return "plant-details-1.html";
+        if (id === 2) return "plant-details-2.html";
+        if (id === 3) return "plant-details-3.html";
+        return "plants.html";
+      }
+
+      var plantId = getPlantId();
+      var form = document.getElementById("editPlantForm");
+      if (!plantId) {
+        showError("No plant selected to edit.");
+        return;
+      }
+
+      fetch(API + "/api/plants/" + plantId)
+        .then(function (r) { return r.json(); })
+        .then(function (p) {
+          if (!p || p.error) {
+            showError(p && p.error ? p.error : "Could not load plant details.");
+            return;
+          }
+
+          form.style.display = "";
+
+          document.getElementById("name").value = p.name || "";
+          document.getElementById("scientificName").value = p.scientificName || "";
+          document.getElementById("location").value = p.location || "";
+          document.getElementById("coordinates").value = p.coordinates || "";
+          document.getElementById("age").value = p.age || "";
+          document.getElementById("description").value = p.description || "";
+          document.getElementById("careInfo").value = p.careInfo || "";
+
+          var title = document.getElementById("editPlantTitle");
+          var subtitle = document.getElementById("editPlantSubtitle");
+          if (title && p.name) title.textContent = "Edit – " + p.name;
+          if (subtitle && p.location) subtitle.textContent = "Update details for " + p.name + " (" + p.location + ").";
+        })
+        .catch(function () {
+          showError("Could not load plant details. Is the server running?");
+        });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var btn = form.querySelector('button[type="submit"]');
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Saving…";
+        }
+
+        var body = {
+          name: document.getElementById("name").value.trim(),
+          scientificName: document.getElementById("scientificName").value.trim(),
+          location: document.getElementById("location").value.trim(),
+          coordinates: document.getElementById("coordinates").value.trim(),
+          age: document.getElementById("age").value.trim(),
+          description: document.getElementById("description").value.trim(),
+          careInfo: document.getElementById("careInfo").value.trim()
+        };
+
+        if (!body.name || !body.scientificName || !body.location) {
+          showError("Please fill in plant name, scientific name, and location.");
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Save Changes";
+          }
+          return;
+        }
+
+        fetch(API + "/api/plants/" + plantId, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.error) {
+              showError(data.error);
+              if (btn) {
+                btn.disabled = false;
+                btn.textContent = "Save Changes";
+              }
+              return;
+            }
+            window.location.href = getDetailsPage(plantId);
+          })
+          .catch(function () {
+            showError("Could not save changes. Is the server running?");
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = "Save Changes";
+            }
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
+
