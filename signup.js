@@ -1,7 +1,12 @@
 // User signup logic for Plant QR
 (function () {
+<<<<<<< HEAD
   var API_URL = "https://plant-qr-website-production.up.railway.app";
   })();
+=======
+  // Use same backend as production admin/user login
+  var API_URL = "https://plant-qr-website-production.up.railway.app";
+>>>>>>> a801ea5 (fix signup)
 
   function get(id) {
     return document.getElementById(id);
@@ -52,7 +57,7 @@
     var btn = form.querySelector('button[type="submit"]');
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Signing up?";
+      btn.textContent = "Signing up…";
     }
 
     fetch(API_URL + "/api/signup", {
@@ -85,7 +90,7 @@
         window.location.href = "dashboard.html";
       })
       .catch(function () {
-        showError("Could not reach server. Is it running on port 3001? Run: npm start");
+        showError("Could not reach server. Please try again.");
         if (btn) {
           btn.disabled = false;
           btn.textContent = "Sign Up";
@@ -93,4 +98,3 @@
       });
   });
 })();
-
