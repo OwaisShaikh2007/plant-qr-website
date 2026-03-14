@@ -38,7 +38,10 @@
       <div class="content-wrapper">
         <div class="dashboard">
           <div class="dashboard-header">
-            <h1>Dashboard</h1>
+            <div class="header">
+              <button id="menuBtn">☰</button>
+              <h1>Dashboard</h1>
+            </div>
             <p id="dashboardWelcome">Welcome back to the Plant QR system.</p>
           </div>
 
@@ -201,6 +204,16 @@
         d.textContent = s;
         return d.innerHTML;
       }
+    })();
+  </script>
+  <script>
+    (function () {
+      var btn = document.getElementById("menuBtn");
+      var sidebar = document.querySelector(".sidebar");
+      if (!btn || !sidebar) return;
+      btn.onclick = function () {
+        sidebar.classList.toggle("active");
+      };
     })();
   </script>
 </body>
