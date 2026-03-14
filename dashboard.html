@@ -149,10 +149,7 @@
       }
 
       if (!isAdmin) {
-        var API = (function () {
-          var host = window.location.hostname || "localhost";
-          return "http://" + host + ":3001";
-        })();
+        var API = "https://plant-qr-website-production.up.railway.app";
         fetch(API + "/api/plants")
           .then(function (r) { return r.json(); })
           .then(function (list) {
