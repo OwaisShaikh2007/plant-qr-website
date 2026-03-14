@@ -1212,6 +1212,25 @@ textarea.form-control {
   .header-actions { flex-direction: column; width: 100%; }
   .header-actions .btn { width: 100%; }
   .preview-actions { flex-direction: column; }
+
+  /* Make tables mobile-friendly: turn rows into stacked cards so all tree details are visible without horizontal scroll */
+  .table-container { overflow-x: visible; }
+  .data-table { display: block; }
+  .data-table thead { display: none; }
+  .data-table tbody { display: block; }
+  .data-table tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px 12px;
+  }
+  .data-table td {
+    display: block;
+    padding: 4px 0;
+    border-bottom: none;
+  }
 }
 
 @media (max-width: 1024px) {
