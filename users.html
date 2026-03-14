@@ -67,10 +67,7 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = (function () {
-        var host = window.location.hostname || "localhost";
-        return "http://" + host + ":3001";
-      })();
+      var API = "https://plant-qr-website-production.up.railway.app";
       var usersList = [];
 
       function escapeHtml(s) {

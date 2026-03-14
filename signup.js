@@ -1,13 +1,6 @@
 // User signup logic for Plant QR
 (function () {
-<<<<<<< HEAD
   var API_URL = "https://plant-qr-website-production.up.railway.app";
-  })();
-=======
-  // Use same backend as production admin/user login
-  var API_URL = "https://plant-qr-website-production.up.railway.app";
->>>>>>> a801ea5 (fix signup)
-
   function get(id) {
     return document.getElementById(id);
   }

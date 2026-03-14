@@ -73,7 +73,7 @@
         window.location.href = "dashboard.html";
       })
       .catch(function () {
-        showError("Could not reach server. Is it running on port 3001? Run: npm start");
+        showError("Could not reach server. Please try again.");
         if (btn) {
           btn.disabled = false;
           btn.textContent = "Sign In";

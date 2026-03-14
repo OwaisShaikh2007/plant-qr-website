@@ -85,10 +85,7 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = (function () {
-        var host = window.location.hostname || "localhost";
-        return "http://" + host + ":3001";
-      })();
+      var API = "https://plant-qr-website-production.up.railway.app";
       function loadReplies() {
         var email = document.getElementById("conEmail").value.trim();
         var phone = document.getElementById("conPhone").value.trim() || (window.userPhone || "");
