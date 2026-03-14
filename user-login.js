@@ -1,9 +1,7 @@
 // User password login logic for Plant QR
 (function () {
-  var API_URL = (function () {
-    var host = window.location.hostname || "localhost";
-    return "http://" + host + ":3001";
-  })();
+  // Use the same backend URL as admin login so this works from GitHub Pages / any host
+  var API_URL = "https://plant-qr-website-production.up.railway.app";
 
   function get(id) {
     return document.getElementById(id);
