@@ -1,6 +1,5 @@
 // User signup logic for Plant QR
 (function () {
-
   var API_URL = "https://plant-qr-website-production.up.railway.app";
 
   function get(id) {
