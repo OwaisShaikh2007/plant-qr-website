@@ -1192,12 +1192,15 @@ textarea.form-control {
 
 /* Media queries */
 @media (max-width: 768px) {
-  .sidebar { width: 80px; }
-  .sidebar-header p,
-  .nav-link span:not(.icon),
-  .btn-logout span:not(.icon) { display: none; }
-  .nav-link { justify-content: center; padding: 14px; }
-  .main-content { margin-left: 80px; }
+  .layout { flex-direction: column; }
+  /* Hide sidebar on small screens to give full width to main content */
+  .sidebar {
+    display: none;
+    width: 100%;
+    position: static;
+    height: auto;
+  }
+  .main-content { margin-left: 0; }
   .content-wrapper { padding: 16px; }
   .page-header { flex-direction: column; }
   .dashboard-content { flex-direction: column; }
