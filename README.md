@@ -1,15 +1,15 @@
 # Plant QR System
 
-A modern web application for managing plants with QR code integration. This system allows you to register plants, generate QR codes, and track scan statistics.
+A modern web application for managing plants with QR code integration. This system allows you to register plants and generate QR codes for plant information.
 
 ## Features
 
 - **Authentication** - Secure login system
-- **Dashboard** - Overview of plants, scans, and statistics
+- **Dashboard** - Overview of plants and statistics
 - **Plant Management** - Add, view, and manage plant information
 - **QR Code Generator** - Generate QR codes for plants
 - **Profile Management** - User profile and settings
-- **Statistics Tracking** - Monitor QR code scans and plant data
+- **Statistics** - Plant data and overview
 
 ## Tech Stack
 

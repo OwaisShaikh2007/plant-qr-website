@@ -22,31 +22,28 @@ const plants = [
     id: nextPlantId++,
     name: "Mango Tree",
     scientificName: "Mangifera indica",
-    location: "Orchard Section 1",
+    location: "COLLEGE CAMPUS",
     coordinates: "16.9839498, 73.3123325",
     dateAdded: "2026-03-05",
     status: "Active",
-    scans: 0,
   },
   {
     id: nextPlantId++,
     name: "Almond Tree",
     scientificName: "Prunus dulcis",
-    location: "Orchard Section 2",
+    location: "COLLEGE CAMPUS",
     coordinates: "16.9839450, 73.3124398",
     dateAdded: "2026-03-05",
     status: "Active",
-    scans: 0,
   },
   {
     id: nextPlantId++,
     name: "Gulmohar Tree",
     scientificName: "Delonix regia",
-    location: "Avenue / Roadside Plantation",
+    location: "COLLEGE CAMPUS",
     coordinates: "16.9839411, 73.3125585",
     dateAdded: "2026-03-05",
     status: "Active",
-    scans: 0,
   },
 ];
 
@@ -359,7 +356,6 @@ app.post("/api/plants", (req, res) => {
       careInfo: (careInfo || "").trim(),
       dateAdded: new Date().toISOString().slice(0, 10),
       status: "Active",
-      scans: 0,
     };
     plants.push(plant);
     res.status(201).json(plant);
@@ -398,17 +394,12 @@ app.put("/api/plants/:id", (req, res) => {
       "description",
       "careInfo",
       "status",
-      "scans",
     ];
 
     const body = req.body || {};
     allowed.forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(body, key) && body[key] != null) {
-        if (key === "scans") {
-          plant[key] = Number(body[key]) || 0;
-        } else {
-          plant[key] = String(body[key]).trim();
-        }
+        plant[key] = String(body[key]).trim();
       }
     });
 

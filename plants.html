@@ -85,14 +85,12 @@
           var sci = (p.scientificName || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
           var loc = (p.location || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
           var date = p.dateAdded || "—";
-          var scans = p.scans != null ? p.scans : 0;
           var detailsPage = getDetailsPage(p.id);
           return "<div class=\"plant-card card\" data-id=\"" + p.id + "\">" +
             "<div class=\"plant-card-header\"><div class=\"plant-icon\"></div><span class=\"badge badge-active\">" + (p.status || "Active") + "</span></div>" +
             "<div class=\"plant-card-body\"><h3>" + name + "</h3><p class=\"scientific-name\">" + sci + "</p>" +
             "<div class=\"plant-info\"><div class=\"info-item\"><span class=\"info-label\">Location:</span><span>" + loc + "</span></div>" +
-            "<div class=\"info-item\"><span class=\"info-label\">Added:</span><span>" + date + "</span></div>" +
-            "<div class=\"info-item\"><span class=\"info-label\">Scans:</span><span>" + scans + "</span></div></div></div>" +
+            "<div class=\"info-item\"><span class=\"info-label\">Added:</span><span>" + date + "</span></div></div></div>" +
             "<div class=\"plant-card-footer\" style=\"justify-content:space-between;align-items:center;\">" +
             "<a href=\"" + detailsPage + "\" class=\"view-link\">View Details →</a>" +
             (isAdmin ? "<button type=\"button\" class=\"btn btn-outline btn-sm btn-remove\" data-id=\"" + p.id + "\" data-name=\"" + name.replace(/\"/g, "&quot;") + "\">Remove</button>" : "") + "</div></div>";
