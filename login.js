@@ -88,6 +88,8 @@
           sessionStorage.setItem("userName", a.name || "Admin User");
           sessionStorage.setItem("userEmail", a.email || email);
           sessionStorage.setItem("userPhone", a.phone || "");
+          sessionStorage.setItem("userJoinedDate", a.dateAdded || a.createdAt || "");
+          sessionStorage.setItem("userLastLogin", a.lastLogin || "");
         } catch (e) {}
 
         window.location.href = "dashboard.html";
@@ -191,6 +193,8 @@
           sessionStorage.setItem("userName", a.name || "Admin User");
           sessionStorage.setItem("userEmail", a.email || email);
           sessionStorage.setItem("userPhone", a.phone || "");
+          sessionStorage.setItem("userJoinedDate", a.dateAdded || a.createdAt || "");
+          sessionStorage.setItem("userLastLogin", a.lastLogin || "");
         } catch (e) {}
 
         window.location.href = "dashboard.html";

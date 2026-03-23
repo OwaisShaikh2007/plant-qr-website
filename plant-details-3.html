@@ -71,54 +71,11 @@
               </div>
               <div class="care-section">
                 <h3>Care Information</h3>
-                <h4>Ideal Growing Conditions</h4>
-                <ul>
-                  <li><strong>Plant type:</strong> Deciduous ornamental flowering tree.</li>
-                  <li><strong>Climate:</strong> Tropical; sensitive to frost.</li>
-                  <li><strong>Temperature:</strong> 20–35&nbsp;°C for best growth and flowering.</li>
-                  <li><strong>Sunlight:</strong> Full sun is required for profuse flowering.</li>
-                  <li><strong>Soil:</strong> Well-drained sandy or loamy soil, slightly acidic to neutral.</li>
-                </ul>
-                <h4>Water Requirement</h4>
-                <ul>
-                  <li>Young plants: require regular watering until well established.</li>
-                  <li>Mature trees: drought tolerant; need only occasional deep watering.</li>
-                  <li>Avoid overwatering and waterlogged conditions to prevent root problems.</li>
-                  <li>Reduce watering during monsoon if natural rainfall is sufficient.</li>
-                </ul>
-                <h4>Common Diseases</h4>
-                <ul>
-                  <li><strong>Root rot:</strong> Occurs mainly in poorly drained or waterlogged soils.</li>
-                  <li><strong>Leaf spot:</strong> Brown or black spots on leaves that may lead to premature leaf drop.</li>
-                  <li><strong>Powdery mildew:</strong> White fungal coating on leaves in humid weather.</li>
-                </ul>
-                <h4>Pests</h4>
-                <ul>
-                  <li><strong>Caterpillars:</strong> Feed on leaves and reduce foliage.</li>
-                  <li><strong>Aphids:</strong> Cause leaf curling and secrete honeydew, which can lead to sooty mold.</li>
-                  <li><strong>Scale insects:</strong> Suck sap and weaken branches and twigs.</li>
-                </ul>
-                <h4>Symptoms of Poor Health</h4>
-                <ul>
-                  <li>Yellowing leaves and pale foliage.</li>
-                  <li>Reduced or poor flowering compared to normal seasons.</li>
-                  <li>Leaf drop occurring earlier than usual.</li>
-                  <li>Stunted growth or sparse canopy.</li>
-                </ul>
-                <h4>Preventive Care</h4>
-                <ul>
-                  <li>Ensure excellent soil drainage to avoid standing water and root rot.</li>
-                  <li>Prune lightly to maintain shape, remove weak or crossing branches, and improve airflow.</li>
-                  <li>Avoid excessive nitrogen fertilizer, which can increase leafy growth but reduce flowering.</li>
-                  <li>Promptly remove and destroy infected leaves or branches to limit disease spread.</li>
-                  <li>Use neem-based or similar eco-friendly sprays for early pest control.</li>
-                </ul>
-                <h4>Fertilizer Recommendation</h4>
-                <ul>
-                  <li>Apply a balanced NPK fertilizer once or twice a year, especially during active growth.</li>
-                  <li>Use organic manure or compost during early growth stages to build soil fertility.</li>
-                  <li>Mature trees usually need minimal fertilization but may benefit from micronutrients in poor soils.</li>
-                </ul>
+                <p>
+                  <a href="https://drive.google.com/file/d/1wPuRYKehAH4xe35K8R4Qyc6QOGRV3ala/view?usp=sharing" target="_blank" rel="noopener">
+                    View Care Information (PDF)
+                  </a>
+                </p>
               </div>
             </div>
           </div>
@@ -166,13 +123,6 @@
             var desc = document.querySelector(".description-section p");
             if (desc) desc.textContent = p.description;
           }
-          if (p.careInfo) {
-            var care = document.querySelector(".care-section");
-            if (care) {
-              care.innerHTML = "<h3>Care Information</h3><p>" + p.careInfo + "</p>";
-            }
-          }
-
           // Map link for location / coordinates
           var mapRow = document.getElementById("mapLinkRow");
           var mapLink = document.getElementById("mapLink");

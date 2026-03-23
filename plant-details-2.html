@@ -72,55 +72,11 @@
               </div>
               <div class="care-section">
                 <h3>Care Information</h3>
-                <h4>Ideal Growing Conditions</h4>
-                <ul>
-                  <li><strong>Climate:</strong> Temperate with cool winters and warm, dry summers.</li>
-                  <li><strong>Temperature:</strong> 15–30&nbsp;°C for ideal growth.</li>
-                  <li><strong>Sunlight:</strong> Full sun is essential for good nut production.</li>
-                  <li><strong>Soil:</strong> Well-drained sandy loam with pH 6.0–7.5.</li>
-                  <li><strong>Chilling:</strong> Requires adequate winter chilling hours for proper flowering.</li>
-                </ul>
-                <h4>Water Requirement</h4>
-                <ul>
-                  <li>Young trees: water deeply about once a week, depending on soil and weather.</li>
-                  <li>Mature trees: provide deep irrigation every 10–14 days in the growing season.</li>
-                  <li>Avoid waterlogging, as almond roots are very sensitive to excess moisture and root diseases.</li>
-                  <li>Water demand increases during nut development; adjust irrigation accordingly.</li>
-                </ul>
-                <h4>Common Diseases</h4>
-                <ul>
-                  <li><strong>Leaf curl:</strong> Causes distorted, reddish leaves in spring.</li>
-                  <li><strong>Brown rot:</strong> Affects blossoms and developing nuts in humid conditions.</li>
-                  <li><strong>Shot hole disease:</strong> Produces small holes in leaves due to fungal infection.</li>
-                </ul>
-                <h4>Pests</h4>
-                <ul>
-                  <li><strong>Aphids:</strong> Cause leaf curling and secrete sticky honeydew.</li>
-                  <li><strong>Spider mites:</strong> Lead to yellowing and speckling of leaves, sometimes with fine webbing.</li>
-                  <li><strong>Peach twig borer:</strong> Bores into young shoots and nuts, reducing yield.</li>
-                </ul>
-                <h4>Symptoms of Poor Health</h4>
-                <ul>
-                  <li>Curled, distorted, or reddish leaves in spring.</li>
-                  <li>Gum oozing from branches, twigs, or trunk.</li>
-                  <li>Poor nut set, small or shriveled kernels, and low overall yield.</li>
-                  <li>Premature leaf yellowing or leaf fall.</li>
-                </ul>
-                <h4>Preventive Care</h4>
-                <ul>
-                  <li>Perform winter pruning to remove weak, diseased, or crossing branches and improve airflow.</li>
-                  <li>Apply dormant copper spray before bud break to help manage fungal diseases.</li>
-                  <li>Keep the tree base weed free to reduce competition for nutrients and water.</li>
-                  <li>Remove and destroy infected plant parts to limit disease spread.</li>
-                  <li>Monitor regularly during spring for early signs of pests and diseases.</li>
-                </ul>
-                <h4>Fertilizer Recommendation</h4>
-                <ul>
-                  <li>Apply nitrogen fertilizer in early spring to support vegetative growth and flowering.</li>
-                  <li>Use phosphorus and potassium based on soil test recommendations.</li>
-                  <li>Add organic compost or well-rotted farmyard manure every year to maintain soil health.</li>
-                  <li>Foliar sprays of micronutrients like zinc and boron can improve nut set and kernel quality.</li>
-                </ul>
+                <p>
+                  <a href="https://drive.google.com/file/d/10TK0a5BrcsvW6Fk-xZ1qJx_mjEbFYrNi/view?usp=sharing" target="_blank" rel="noopener">
+                    View Care Information (PDF)
+                  </a>
+                </p>
               </div>
             </div>
           </div>
@@ -168,13 +124,6 @@
             var desc = document.querySelector(".description-section p");
             if (desc) desc.textContent = p.description;
           }
-          if (p.careInfo) {
-            var care = document.querySelector(".care-section");
-            if (care) {
-              care.innerHTML = "<h3>Care Information</h3><p>" + p.careInfo + "</p>";
-            }
-          }
-
           // Map link for location / coordinates
           var mapRow = document.getElementById("mapLinkRow");
           var mapLink = document.getElementById("mapLink");

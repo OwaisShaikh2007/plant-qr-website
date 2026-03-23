@@ -80,6 +80,8 @@
           sessionStorage.setItem("userName", u.name || name);
           sessionStorage.setItem("userEmail", u.email || email);
           sessionStorage.setItem("userPhone", u.phone || phone);
+          sessionStorage.setItem("userJoinedDate", u.dateAdded || u.createdAt || "");
+          sessionStorage.setItem("userLastLogin", u.lastLogin || "");
         } catch (e) {}
         window.location.href = "dashboard.html";
       })

@@ -69,6 +69,8 @@
           sessionStorage.setItem("userName", u.name || "");
           sessionStorage.setItem("userEmail", u.email || "");
           sessionStorage.setItem("userPhone", u.phone || "");
+          sessionStorage.setItem("userJoinedDate", u.dateAdded || u.createdAt || "");
+          sessionStorage.setItem("userLastLogin", u.lastLogin || "");
         } catch (e) {}
         window.location.href = "dashboard.html";
       })

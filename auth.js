@@ -3,6 +3,8 @@
   var name = (sessionStorage && sessionStorage.getItem("userName")) || (role === "admin" ? "Admin User" : "User");
   var email = (sessionStorage && sessionStorage.getItem("userEmail")) || "";
   var phone = (sessionStorage && sessionStorage.getItem("userPhone")) || "";
+  var joinedDate = (sessionStorage && sessionStorage.getItem("userJoinedDate")) || "";
+  var lastLogin = (sessionStorage && sessionStorage.getItem("userLastLogin")) || "";
 
   window.userRole = role;
   window.userName = name;
@@ -37,13 +39,34 @@
   var profilePhone = document.getElementById("profile-phone");
   var profileRole = document.getElementById("profile-role");
   var profileRoleValue = document.getElementById("profile-role-value");
+  var profileJoinedDate = document.getElementById("profile-joined-date");
+  var profileLastLogin = document.getElementById("profile-last-login");
   var roleText = isAdmin ? "Administrator" : "User";
+
+  function formatDateOnly(value) {
+    if (!value) return "—";
+    // Keep YYYY-MM-DD as-is if already in that format.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+    var d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toISOString().slice(0, 10);
+  }
+
+  function formatDateTime(value) {
+    if (!value) return "—";
+    var d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toLocaleString();
+  }
+
   if (profileName) profileName.textContent = name;
   if (profileFullname) profileFullname.textContent = name;
   if (profileEmail) profileEmail.textContent = email || "—";
   if (profilePhone) profilePhone.textContent = phone || "—";
   if (profileRole) profileRole.textContent = roleText;
   if (profileRoleValue) profileRoleValue.textContent = roleText;
+  if (profileJoinedDate) profileJoinedDate.textContent = formatDateOnly(joinedDate);
+  if (profileLastLogin) profileLastLogin.textContent = formatDateTime(lastLogin);
 
   // Logout: clear session
   var logoutBtn = document.querySelector(".btn-logout");
@@ -51,7 +74,14 @@
     var href = logoutBtn.getAttribute("href");
     if (href && href.indexOf("index") !== -1) {
       logoutBtn.addEventListener("click", function () {
-        try { sessionStorage.removeItem("userRole"); sessionStorage.removeItem("userName"); sessionStorage.removeItem("userEmail"); sessionStorage.removeItem("userPhone"); } catch (e) {}
+        try {
+          sessionStorage.removeItem("userRole");
+          sessionStorage.removeItem("userName");
+          sessionStorage.removeItem("userEmail");
+          sessionStorage.removeItem("userPhone");
+          sessionStorage.removeItem("userJoinedDate");
+          sessionStorage.removeItem("userLastLogin");
+        } catch (e) {}
       });
     }
   }
