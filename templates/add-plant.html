@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Plant - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link active"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="add-plant">
+          <div class="page-header">
+            <div>
+              <h1>Add New Plant</h1>
+              <p>Register a new plant in the QR system</p>
+            </div>
+            <a href="plants.html" class="btn btn-outline">← Cancel</a>
+          </div>
+
+          <div class="form-container">
+            <form id="addPlantForm" class="plant-form card">
+              <div class="form-section">
+                <h2>Basic Information</h2>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="name">Plant Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="e.g., Oak Tree" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="scientificName">Scientific Name <span class="required">*</span></label>
+                    <input type="text" id="scientificName" name="scientificName" class="form-control" placeholder="e.g., Quercus robur" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="location">Location <span class="required">*</span></label>
+                    <input type="text" id="location" name="location" class="form-control" placeholder="e.g., Park A, Zone 1" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="coordinates">Coordinates</label>
+                    <input type="text" id="coordinates" name="coordinates" class="form-control" placeholder="e.g., 40.7128° N, 74.0060° W" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h2>Basic Tree Details</h2>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="text" id="age" name="age" class="form-control" placeholder="e.g., 5 years / Newly planted" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h2>Additional Information</h2>
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <textarea id="description" name="description" class="form-control" placeholder="Describe the plant, its characteristics..." rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="careInfo">Care Information</label>
+                  <textarea id="careInfo" name="careInfo" class="form-control" placeholder="Care instructions, maintenance tips..." rows="4"></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <a href="plants.html" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Add Plant</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
+      var API = "https://plant-qr-website-production.up.railway.app";
+      document.getElementById("addPlantForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fd = new FormData(this);
+        var body = {
+          name: fd.get("name") || "",
+          scientificName: fd.get("scientificName") || "",
+          location: fd.get("location") || "",
+          coordinates: fd.get("coordinates") || "",
+          age: fd.get("age") || "",
+          description: fd.get("description") || "",
+          careInfo: fd.get("careInfo") || ""
+        };
+        var btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = "Adding…";
+        fetch(API + "/api/plants", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }).then(function (r) {
+          if (r.ok) { window.location.href = "plants.html"; return; }
+          return r.json().then(function (d) { throw new Error(d.error || "Failed to add plant"); });
+        }).catch(function (err) {
+          btn.disabled = false;
+          btn.textContent = "Add Plant";
+          alert(err.message || "Failed to add plant. Is the server running?");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

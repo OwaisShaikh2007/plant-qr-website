@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plants - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link active"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="plant-list">
+          <div class="page-header">
+            <div>
+              <h1>Plants</h1>
+              <p>Manage all your plants and QR codes</p>
+            </div>
+            <a href="add-plant.html" class="btn btn-primary admin-only">Add New Plant</a>
+          </div>
+
+          <!-- Filters removed as per requirement -->
+
+          <div class="plants-grid" id="plantsGrid">
+            <p class="no-results" style="grid-column:1/-1;">Loading plants…</p>
+          </div>
+
+          <div class="stats-summary card" id="plantsStats">
+            <div class="stat-item"><span class="stat-value" id="totalPlants">0</span><span class="stat-label">Total Plants</span></div>
+            <div class="stat-item"><span class="stat-value" id="activePlants">0</span><span class="stat-label">Active Plants</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      var API = "https://plant-qr-website-production.up.railway.app";
+      var isAdmin = window.userRole === "admin";
+
+      function getDetailsPage(id) {
+        var num = parseInt(id, 10);
+        if (num === 1) return "plant-details-1.html";
+        if (num === 2) return "plant-details-2.html";
+        if (num === 3) return "plant-details-3.html";
+        return "plant-details.html?id=" + encodeURIComponent(id);
+      }
+
+      function render(list) {
+        var grid = document.getElementById("plantsGrid");
+        var active = 0;
+        if (!Array.isArray(list) || list.length === 0) {
+          grid.innerHTML = "<p class=\"no-results\" style=\"grid-column:1/-1;\">No plants yet. <a href=\"add-plant.html\">Add a tree</a>.</p>";
+          document.getElementById("totalPlants").textContent = "0";
+          document.getElementById("activePlants").textContent = "0";
+          return;
+        }
+        grid.innerHTML = list.map(function (p) {
+          if ((p.status || "Active") === "Active") active++;
+          var name = (p.name || "Plant").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          var sci = (p.scientificName || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          var loc = (p.location || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          var date = p.dateAdded || "—";
+          var detailsPage = getDetailsPage(p.id);
+          return "<div class=\"plant-card card\" data-id=\"" + p.id + "\">" +
+            "<div class=\"plant-card-header\"><div class=\"plant-icon\"></div><span class=\"badge badge-active\">" + (p.status || "Active") + "</span></div>" +
+            "<div class=\"plant-card-body\"><h3>" + name + "</h3><p class=\"scientific-name\">" + sci + "</p>" +
+            "<div class=\"plant-info\"><div class=\"info-item\"><span class=\"info-label\">Location:</span><span>" + loc + "</span></div>" +
+            "<div class=\"info-item\"><span class=\"info-label\">Added:</span><span>" + date + "</span></div></div></div>" +
+            "<div class=\"plant-card-footer\" style=\"justify-content:space-between;align-items:center;\">" +
+            "<a href=\"" + detailsPage + "\" class=\"view-link\">View Details →</a>" +
+            (isAdmin ? "<button type=\"button\" class=\"btn btn-outline btn-sm btn-remove\" data-id=\"" + p.id + "\" data-name=\"" + name.replace(/\"/g, "&quot;") + "\">Remove</button>" : "") + "</div></div>";
+        }).join("");
+
+        document.getElementById("totalPlants").textContent = list.length;
+        document.getElementById("activePlants").textContent = active;
+
+        grid.querySelectorAll(".btn-remove").forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var id = btn.getAttribute("data-id");
+            var name = btn.getAttribute("data-name");
+            if (!confirm("Remove tree \"" + name + "\"? This cannot be undone.")) return;
+            fetch(API + "/api/plants/" + id, { method: "DELETE" })
+              .then(function (r) { return r.json(); })
+              .then(function () { load(); })
+              .catch(function () { alert("Failed to remove. Is the server running?"); });
+          });
+        });
+      }
+      function load() {
+        fetch(API + "/api/plants")
+          .then(function (r) { return r.json(); })
+          .then(render)
+          .catch(function () {
+            document.getElementById("plantsGrid").innerHTML = "<p class=\"no-results\" style=\"grid-column:1/-1;\">Could not load plants. Start the server: npm start</p>";
+          });
+      }
+      load();
+    })();
+  </script>
+</body>
+</html>

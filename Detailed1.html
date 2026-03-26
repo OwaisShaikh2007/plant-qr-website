@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Plant Detailed Info</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #eef6ff;
+}
+
+.container {
+    width: 380px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    color: blue;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: blue;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Detailed Tree Info</h2>
+
+<input id="name" placeholder="Name">
+<input id="scientific" placeholder="Scientific Name">
+<input id="location" placeholder="Location">
+<input id="coordinates" placeholder="Coordinates">
+<input id="date" type="date">
+<textarea id="description" placeholder="Description"></textarea>
+
+<textarea id="ideal" placeholder="Ideal Growing Conditions"></textarea>
+<textarea id="water" placeholder="Water Requirements"></textarea>
+<textarea id="disease" placeholder="Common Disease"></textarea>
+<textarea id="symptoms" placeholder="Symptoms of Poor Health"></textarea>
+<textarea id="care" placeholder="Preventive Care"></textarea>
+<textarea id="fertilizer" placeholder="Fertilizer Recommendation"></textarea>
+
+<button onclick="submitData()">Save</button>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRVnX7xxaDf-K88jumAGT3zlMQUcNn57WMnfdRgl21wULpeU02_nK1sljwCrmQTJS30w/exec";
+
+function submitData() {
+    const data = {
+        type: "detailed",
+        name: document.getElementById("name").value,
+        scientific: document.getElementById("scientific").value,
+        location: document.getElementById("location").value,
+        coordinates: document.getElementById("coordinates").value,
+        date: document.getElementById("date").value,
+        description: document.getElementById("description").value,
+        ideal: document.getElementById("ideal").value,
+        water: document.getElementById("water").value,
+        disease: document.getElementById("disease").value,
+        symptoms: document.getElementById("symptoms").value,
+        care: document.getElementById("care").value,
+        fertilizer: document.getElementById("fertilizer").value
+    };
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(msg => alert(msg))
+    .catch(err => alert("Error"));
+}
+</script>
+
+</body>
+</html>

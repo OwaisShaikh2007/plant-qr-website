@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Plant Basic Info</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #eaf7ea;
+}
+
+.container {
+    width: 350px;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    color: green;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: green;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Basic Tree Info</h2>
+
+<input id="name" placeholder="Name">
+<input id="scientific" placeholder="Scientific Name">
+<input id="location" placeholder="Location">
+<input id="coordinates" placeholder="Coordinates">
+<input id="date" type="date">
+<textarea id="description" placeholder="Description"></textarea>
+
+<button onclick="submitData()">Save</button>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRVnX7xxaDf-K88jumAGT3zlMQUcNn57WMnfdRgl21wULpeU02_nK1sljwCrmQTJS30w/exec";
+
+function submitData() {
+    const data = {
+        type: "basic",
+        name: document.getElementById("name").value,
+        scientific: document.getElementById("scientific").value,
+        location: document.getElementById("location").value,
+        coordinates: document.getElementById("coordinates").value,
+        date: document.getElementById("date").value,
+        description: document.getElementById("description").value
+    };
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(msg => alert(msg))
+    .catch(err => alert("Error"));
+}
+</script>
+
+</body>
+</html>
