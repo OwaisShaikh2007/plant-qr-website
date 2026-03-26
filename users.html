@@ -67,7 +67,6 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
       var usersList = [];
 
       function escapeHtml(s) {
@@ -97,7 +96,7 @@
         }).join("");
       }
 
-      fetch(API + "/api/users")
+      fetch("https://plant-qr-website-production.up.railway.app/api/users")
         .then(function (r) { return r.json(); })
         .then(function (list) {
           usersList = Array.isArray(list) ? list : [];
@@ -150,7 +149,7 @@
 
         btn.disabled = true;
 
-        fetch(API + "/api/users", {
+        fetch("https://plant-qr-website-production.up.railway.app/api/users", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

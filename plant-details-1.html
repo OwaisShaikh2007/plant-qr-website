@@ -88,7 +88,6 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var API = "https://plant-qr-website-production.up.railway.app";
       var PLANT_ID = 1;
 
       function setText(selector, value) {
@@ -111,7 +110,7 @@
         }
       }
 
-      fetch(API + "/api/plants/" + PLANT_ID)
+      fetch("https://plant-qr-website-production.up.railway.app/api/plants/" + PLANT_ID)
         .then(function (r) { return r.json(); })
         .then(function (p) {
           if (!p || p.error) return;

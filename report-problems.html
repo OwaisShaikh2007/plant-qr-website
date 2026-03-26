@@ -81,14 +81,13 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
       function loadReplies() {
         var name = document.getElementById("repName").value.trim();
         if (!name) {
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your name to see admin replies.</p>";
           return;
         }
-        fetch(API + "/api/my-messages?type=report")
+        fetch("https://plant-qr-website-production.up.railway.app/api/my-messages?type=report")
           .then(function (r) { return r.json(); })
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.name && m.name.toLowerCase() === name.toLowerCase() && m.adminReply; });
@@ -128,7 +127,7 @@
         var msgEl = document.getElementById("reportMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API + "/api/reports", {
+        fetch("https://plant-qr-website-production.up.railway.app/api/reports", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

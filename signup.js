@@ -1,7 +1,5 @@
 // User signup logic for Plant QR
 (function () {
-  var API_URL = "https://plant-qr-website-production.up.railway.app";
-
   function get(id) {
     return document.getElementById(id);
   }
@@ -54,7 +52,7 @@
       btn.textContent = "Signing up…";
     }
 
-    fetch(API_URL + "/api/signup", {
+    fetch("https://plant-qr-website-production.up.railway.app/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

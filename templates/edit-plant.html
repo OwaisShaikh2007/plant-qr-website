@@ -101,8 +101,6 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
-
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -130,7 +128,7 @@
         return;
       }
 
-      fetch(API + "/api/plants/" + plantId)
+      fetch("https://plant-qr-website-production.up.railway.app/api/plants/" + plantId)
         .then(function (r) { return r.json(); })
         .then(function (p) {
           if (!p || p.error) {
@@ -184,7 +182,7 @@
           return;
         }
 
-        fetch(API + "/api/plants/" + plantId, {
+        fetch("https://plant-qr-website-production.up.railway.app/api/plants/" + plantId, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)

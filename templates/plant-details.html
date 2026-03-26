@@ -103,8 +103,6 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var API = "https://plant-qr-website-production.up.railway.app";
-
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -124,7 +122,7 @@
         return;
       }
 
-      fetch(API + "/api/plants/" + id)
+      fetch("https://plant-qr-website-production.up.railway.app/api/plants/" + id)
         .then(function (r) { return r.json(); })
         .then(function (p) {
           if (!p || p.error) {

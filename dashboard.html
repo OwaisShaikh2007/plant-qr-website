@@ -152,8 +152,7 @@
       }
 
       if (!isAdmin) {
-        var API = "https://plant-qr-website-production.up.railway.app";
-        fetch(API + "/api/plants")
+        fetch("https://plant-qr-website-production.up.railway.app/api/plants")
           .then(function (r) { return r.json(); })
           .then(function (list) {
             if (!Array.isArray(list)) return;

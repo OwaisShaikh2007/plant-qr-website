@@ -1,8 +1,5 @@
 // User password login logic for Plant QR
 (function () {
-  // Use the same backend URL as admin login so this works from GitHub Pages / any host
-  var API_URL = "https://plant-qr-website-production.up.railway.app";
-
   function get(id) {
     return document.getElementById(id);
   }
@@ -44,7 +41,7 @@
       btn.textContent = "Signing in?";
     }
 
-    fetch(API_URL + "/api/login-user", {
+    fetch("https://plant-qr-website-production.up.railway.app/api/login-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

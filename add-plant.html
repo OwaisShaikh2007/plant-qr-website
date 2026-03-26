@@ -103,7 +103,6 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
       document.getElementById("addPlantForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var fd = new FormData(this);
@@ -119,7 +118,7 @@
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
         btn.textContent = "Adding…";
-        fetch(API + "/api/plants", {
+        fetch("https://plant-qr-website-production.up.railway.app/api/plants", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)

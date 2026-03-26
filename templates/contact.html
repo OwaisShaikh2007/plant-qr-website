@@ -85,7 +85,6 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
       function loadReplies() {
         var email = document.getElementById("conEmail").value.trim();
         var phone = document.getElementById("conPhone").value.trim() || (window.userPhone || "");
@@ -93,10 +92,11 @@
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your email or phone to see admin replies.</p>";
           return;
         }
-        var url = API + "/api/my-messages?type=contact";
-        if (email) url += "&email=" + encodeURIComponent(email);
-        if (phone) url += "&phone=" + encodeURIComponent(phone);
-        fetch(url)
+        fetch(
+          "https://plant-qr-website-production.up.railway.app/api/my-messages?type=contact" +
+            (email ? "&email=" + encodeURIComponent(email) : "") +
+            (phone ? "&phone=" + encodeURIComponent(phone) : "")
+        )
           .then(function (r) { return r.json(); })
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.adminReply; });
@@ -138,7 +138,7 @@
         var msgEl = document.getElementById("contactMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API + "/api/contact", {
+        fetch("https://plant-qr-website-production.up.railway.app/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

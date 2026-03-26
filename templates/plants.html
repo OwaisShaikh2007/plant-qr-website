@@ -59,7 +59,6 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var API = "https://plant-qr-website-production.up.railway.app";
       var isAdmin = window.userRole === "admin";
 
       function getDetailsPage(id) {
@@ -105,7 +104,7 @@
             var id = btn.getAttribute("data-id");
             var name = btn.getAttribute("data-name");
             if (!confirm("Remove tree \"" + name + "\"? This cannot be undone.")) return;
-            fetch(API + "/api/plants/" + id, { method: "DELETE" })
+            fetch("https://plant-qr-website-production.up.railway.app/api/plants/" + id, { method: "DELETE" })
               .then(function (r) { return r.json(); })
               .then(function () { load(); })
               .catch(function () { alert("Failed to remove. Is the server running?"); });
@@ -113,7 +112,7 @@
         });
       }
       function load() {
-        fetch(API + "/api/plants")
+        fetch("https://plant-qr-website-production.up.railway.app/api/plants")
           .then(function (r) { return r.json(); })
           .then(render)
           .catch(function () {

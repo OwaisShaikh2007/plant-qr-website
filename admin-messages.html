@@ -104,7 +104,6 @@
         return;
       }
 
-      var API = "https://plant-qr-website-production.up.railway.app";
       var messages = [];
       var filteredMessages = [];
 
@@ -201,7 +200,7 @@
       }
 
       function loadMessages() {
-        fetch(API + "/api/messages")
+        fetch("https://plant-qr-website-production.up.railway.app/api/messages")
           .then(function (r) { return r.json(); })
           .then(function (data) {
             messages = data || [];
@@ -263,7 +262,7 @@
         }
 
         btn.disabled = true;
-        fetch(API + "/api/messages/" + messageId + "/reply", {
+        fetch("https://plant-qr-website-production.up.railway.app/api/messages/" + messageId + "/reply", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ reply: replyText })

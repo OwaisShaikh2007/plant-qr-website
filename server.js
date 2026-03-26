@@ -586,7 +586,7 @@ app.get("/api/my-messages", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
   if (!process.env.FAST2SMS_API_KEY) {
     console.log("Demo mode: No FAST2SMS_API_KEY – OTP will be returned in API response (no SMS).");
   }
