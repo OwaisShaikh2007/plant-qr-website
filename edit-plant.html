@@ -81,9 +81,22 @@
                   <label for="description">Description</label>
                   <textarea id="description" name="description" class="form-control" rows="4"></textarea>
                 </div>
+              </div>
+
+              <div class="form-section">
+                <h2>Guides</h2>
+                <p>Open forms and update cloud links for this plant.</p>
+                <div class="form-actions" style="justify-content:flex-start;gap:10px;flex-wrap:wrap;">
+                  <button type="button" id="openBasicFillBtn" class="btn btn-outline">Open Basic Info Form</button>
+                  <button type="button" id="openDetailedFillBtn" class="btn btn-outline">Open Detailed Info Form</button>
+                </div>
                 <div class="form-group">
-                  <label for="careInfo">Care Information</label>
-                  <textarea id="careInfo" name="careInfo" class="form-control" rows="4"></textarea>
+                  <label for="basicHtmlLink">Basic Guide Link</label>
+                  <input type="url" id="basicHtmlLink" name="basicHtmlLink" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label for="detailedHtmlLink">Detailed Guide Link</label>
+                  <input type="url" id="detailedHtmlLink" name="detailedHtmlLink" class="form-control" />
                 </div>
               </div>
 
@@ -101,8 +114,8 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
-
+      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -120,17 +133,30 @@
         if (id === 1) return "plant-details-1.html";
         if (id === 2) return "plant-details-2.html";
         if (id === 3) return "plant-details-3.html";
-        return "plants.html";
+        return "plant-details.html?id=" + encodeURIComponent(id);
       }
 
       var plantId = getPlantId();
       var form = document.getElementById("editPlantForm");
+      var openBasicFillBtn = document.getElementById("openBasicFillBtn");
+      var openDetailedFillBtn = document.getElementById("openDetailedFillBtn");
       if (!plantId) {
         showError("No plant selected to edit.");
         return;
       }
 
-      fetch(API + "/api/plants/" + plantId)
+      function openHtmlForFilling(which) {
+        var url = which === "basic" ? "basic1.html" : "Detailed1.html";
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+      if (openBasicFillBtn) {
+        openBasicFillBtn.addEventListener("click", function () { openHtmlForFilling("basic"); });
+      }
+      if (openDetailedFillBtn) {
+        openDetailedFillBtn.addEventListener("click", function () { openHtmlForFilling("detailed"); });
+      }
+
+      fetch(API_BASE + "/api/plants/" + plantId)
         .then(function (r) { return r.json(); })
         .then(function (p) {
           if (!p || p.error) {
@@ -146,7 +172,8 @@
           document.getElementById("coordinates").value = p.coordinates || "";
           document.getElementById("age").value = p.age || "";
           document.getElementById("description").value = p.description || "";
-          document.getElementById("careInfo").value = p.careInfo || "";
+          document.getElementById("basicHtmlLink").value = p.basicHtmlLink || "";
+          document.getElementById("detailedHtmlLink").value = p.detailedHtmlLink || "";
 
           var title = document.getElementById("editPlantTitle");
           var subtitle = document.getElementById("editPlantSubtitle");
@@ -172,7 +199,8 @@
           coordinates: document.getElementById("coordinates").value.trim(),
           age: document.getElementById("age").value.trim(),
           description: document.getElementById("description").value.trim(),
-          careInfo: document.getElementById("careInfo").value.trim()
+          basicHtmlLink: document.getElementById("basicHtmlLink").value.trim(),
+          detailedHtmlLink: document.getElementById("detailedHtmlLink").value.trim()
         };
 
         if (!body.name || !body.scientificName || !body.location) {
@@ -184,7 +212,7 @@
           return;
         }
 
-        fetch(API + "/api/plants/" + plantId, {
+        fetch(API_BASE + "/api/plants/" + plantId, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)

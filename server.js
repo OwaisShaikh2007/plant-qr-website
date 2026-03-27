@@ -338,7 +338,7 @@ app.get("/api/plants/:id", (req, res) => {
 
 app.post("/api/plants", (req, res) => {
   try {
-    const { name, scientificName, location, coordinates, height, diameter, age, description, careInfo } = req.body || {};
+    const { name, scientificName, location, coordinates, height, diameter, age, description, basicHtmlLink, detailedHtmlLink } = req.body || {};
     if (!name || !location) {
       return res.status(400).json({ error: "Plant name and location are required." });
     }
@@ -353,7 +353,8 @@ app.post("/api/plants", (req, res) => {
       diameter: (diameter || "").trim(),
       age: (age || "").trim(),
       description: (description || "").trim(),
-      careInfo: (careInfo || "").trim(),
+      basicHtmlLink: (basicHtmlLink || "").trim(),
+      detailedHtmlLink: (detailedHtmlLink || "").trim(),
       dateAdded: new Date().toISOString().slice(0, 10),
       status: "Active",
     };
@@ -392,7 +393,8 @@ app.put("/api/plants/:id", (req, res) => {
       "diameter",
       "age",
       "description",
-      "careInfo",
+      "basicHtmlLink",
+      "detailedHtmlLink",
       "status",
     ];
 

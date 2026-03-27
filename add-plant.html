@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Plant - Plant QR System</title>
   <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 </head>
 <body>
   <div class="layout">
@@ -44,7 +50,11 @@
           <div class="form-container">
             <form id="addPlantForm" class="plant-form card">
               <div class="form-section">
-                <h2>Basic Information</h2>
+                <h2>Plant Info</h2>
+                <p>Add basic details, pick coordinates on the map, then continue with cloud links and details.</p>
+              </div>
+
+              <div id="stepBasicInfo">
                 <div class="form-row">
                   <div class="form-group">
                     <label for="name">Plant Name <span class="required">*</span></label>
@@ -55,43 +65,70 @@
                     <input type="text" id="scientificName" name="scientificName" class="form-control" placeholder="e.g., Quercus robur" required />
                   </div>
                 </div>
+
                 <div class="form-row">
                   <div class="form-group">
                     <label for="location">Location <span class="required">*</span></label>
                     <input type="text" id="location" name="location" class="form-control" placeholder="e.g., Park A, Zone 1" required />
                   </div>
                   <div class="form-group">
-                    <label for="coordinates">Coordinates</label>
-                    <input type="text" id="coordinates" name="coordinates" class="form-control" placeholder="e.g., 40.7128° N, 74.0060° W" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-section">
-                <h2>Basic Tree Details</h2>
-                <div class="form-row">
-                  <div class="form-group">
                     <label for="age">Age</label>
                     <input type="text" id="age" name="age" class="form-control" placeholder="e.g., 5 years / Newly planted" />
                   </div>
                 </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="coordinates">Coordinates</label>
+                    <input type="text" id="coordinates" name="coordinates" class="form-control" placeholder="e.g., 40.7128, -74.0060" />
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <h2>Pick Location on Map</h2>
+                  <p>Click on the map to drop a pin. Coordinates will update automatically.</p>
+                  <div id="map" style="height:320px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,0.08);"></div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" id="useCurrentLocationBtn" class="btn btn-outline">Use Current Location</button>
+                </div>
               </div>
 
-              <div class="form-section">
-                <h2>Additional Information</h2>
+              <div id="stepCloudSaving">
+                <div class="form-section">
+                  <h2>Cloud Saving</h2>
+                  <p>Use these forms to store extra info in the cloud, and paste the saved links here.</p>
+                </div>
+
+                <div class="form-actions" style="justify-content:flex-start;gap:10px;flex-wrap:wrap;">
+                  <button type="button" id="openBasicFillBtn" class="btn btn-outline">Open Basic Info Form</button>
+                  <button type="button" id="openDetailedFillBtn" class="btn btn-outline">Open Detailed Info Form</button>
+                </div>
+
+                <div class="form-group">
+                  <label for="basicHtmlLink">Basic Info (Cloud) Link</label>
+                  <input type="url" id="basicHtmlLink" name="basicHtmlLink" class="form-control" placeholder="Link for basic1.html saved data" />
+                </div>
+                <div class="form-group">
+                  <label for="detailedHtmlLink">Detailed Info (Cloud) Link</label>
+                  <input type="url" id="detailedHtmlLink" name="detailedHtmlLink" class="form-control" placeholder="Link for Detailed1.html saved data" />
+                </div>
+
                 <div class="form-group">
                   <label for="description">Description</label>
                   <textarea id="description" name="description" class="form-control" placeholder="Describe the plant, its characteristics..." rows="4"></textarea>
                 </div>
-                <div class="form-group">
-                  <label for="careInfo">Care Information</label>
-                  <textarea id="careInfo" name="careInfo" class="form-control" placeholder="Care instructions, maintenance tips..." rows="4"></textarea>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Save Plant</button>
                 </div>
               </div>
 
-              <div class="form-actions">
-                <a href="plants.html" class="btn btn-outline">Cancel</a>
-                <button type="submit" class="btn btn-primary">Add Plant</button>
+              <div id="savedLinksPreview" class="form-section" style="display:none;">
+                <h2>Saved Cloud Links</h2>
+                <p>These links were saved for this plant:</p>
+                <ul id="savedLinksList"></ul>
               </div>
             </form>
           </div>
@@ -100,35 +137,186 @@
     </main>
   </div>
   <script src="auth.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
-      document.getElementById("addPlantForm").addEventListener("submit", function (e) {
+      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
+      var form = document.getElementById("addPlantForm");
+      var stepBasicInfo = document.getElementById("stepBasicInfo");
+      var stepCloudSaving = document.getElementById("stepCloudSaving");
+      var useCurrentLocationBtn = document.getElementById("useCurrentLocationBtn");
+      var coordinatesInput = document.getElementById("coordinates");
+      var openBasicFillBtn = document.getElementById("openBasicFillBtn");
+      var openDetailedFillBtn = document.getElementById("openDetailedFillBtn");
+      var basicHtmlLinkInput = document.getElementById("basicHtmlLink");
+      var detailedHtmlLinkInput = document.getElementById("detailedHtmlLink");
+      var savedLinksPreview = document.getElementById("savedLinksPreview");
+      var savedLinksList = document.getElementById("savedLinksList");
+
+      // One-time cloud saving: remember last used links
+      try {
+        var saved = JSON.parse(localStorage.getItem("plantQrCloudLinks") || "null");
+        if (saved && typeof saved === "object") {
+          if (saved.basicHtmlLink && basicHtmlLinkInput) basicHtmlLinkInput.value = saved.basicHtmlLink;
+          if (saved.detailedHtmlLink && detailedHtmlLinkInput) detailedHtmlLinkInput.value = saved.detailedHtmlLink;
+        }
+      } catch (_) {}
+
+      function openHtmlForFilling(which) {
+        var url = which === "basic" ? "basic1.html" : "Detailed1.html";
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      if (openBasicFillBtn) {
+        openBasicFillBtn.addEventListener("click", function () { openHtmlForFilling("basic"); });
+      }
+      if (openDetailedFillBtn) {
+        openDetailedFillBtn.addEventListener("click", function () { openHtmlForFilling("detailed"); });
+      }
+
+      function parseLatLng(value) {
+        var v = (value || "").trim();
+        if (!v) return null;
+        var parts = v.split(",");
+        if (parts.length < 2) return null;
+        var lat = parseFloat(parts[0].trim());
+        var lng = parseFloat(parts[1].trim());
+        if (!isFinite(lat) || !isFinite(lng)) return null;
+        return { lat: lat, lng: lng };
+      }
+
+      function updateMapPinFromCoordinates() {
+        var ll = parseLatLng(coordinatesInput.value);
+        if (!ll) { return; }
+        if (window.__plantMap && window.__plantMapMarker) {
+          window.__plantMapMarker.setLatLng([ll.lat, ll.lng]);
+          window.__plantMap.panTo([ll.lat, ll.lng]);
+        }
+      }
+
+      coordinatesInput.addEventListener("input", updateMapPinFromCoordinates);
+
+      // Leaflet map picker
+      (function initMap() {
+        if (!window.L) { return; }
+        var map = L.map("map", { zoomControl: true }).setView([24.8607, 67.0011], 11); // default (Karachi)
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+        var marker = L.marker(map.getCenter(), { draggable: true }).addTo(map);
+        window.__plantMap = map;
+        window.__plantMapMarker = marker;
+
+        function setFromLatLng(lat, lng) {
+          coordinatesInput.value = lat.toFixed(6) + ", " + lng.toFixed(6);
+        }
+
+        map.on("click", function (e) {
+          marker.setLatLng(e.latlng);
+          setFromLatLng(e.latlng.lat, e.latlng.lng);
+        });
+
+        marker.on("dragend", function () {
+          var pos = marker.getLatLng();
+          setFromLatLng(pos.lat, pos.lng);
+        });
+
+        // If coordinates already typed, reflect on map
+        var ll = parseLatLng(coordinatesInput.value);
+        if (ll) {
+          marker.setLatLng([ll.lat, ll.lng]);
+          map.setView([ll.lat, ll.lng], 16);
+        }
+      })();
+
+      useCurrentLocationBtn.addEventListener("click", function () {
+        if (!navigator.geolocation) {
+          alert("Geolocation is not supported in this browser.");
+          return;
+        }
+        useCurrentLocationBtn.disabled = true;
+        useCurrentLocationBtn.textContent = "Getting location...";
+        navigator.geolocation.getCurrentPosition(function (position) {
+          var lat = position.coords.latitude;
+          var lng = position.coords.longitude;
+          coordinatesInput.value = lat.toFixed(6) + ", " + lng.toFixed(6);
+          if (window.__plantMap && window.__plantMapMarker) {
+            window.__plantMapMarker.setLatLng([lat, lng]);
+            window.__plantMap.setView([lat, lng], 17);
+          }
+          useCurrentLocationBtn.disabled = false;
+          useCurrentLocationBtn.textContent = "Use Current Location";
+        }, function () {
+          useCurrentLocationBtn.disabled = false;
+          useCurrentLocationBtn.textContent = "Use Current Location";
+          alert("Could not get location. Please allow location permission.");
+        });
+      });
+
+      form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var fd = new FormData(this);
+        var fd = new FormData(form);
         var body = {
           name: fd.get("name") || "",
           scientificName: fd.get("scientificName") || "",
           location: fd.get("location") || "",
           coordinates: fd.get("coordinates") || "",
           age: fd.get("age") || "",
-          description: fd.get("description") || "",
-          careInfo: fd.get("careInfo") || ""
+          basicHtmlLink: fd.get("basicHtmlLink") || "",
+          detailedHtmlLink: fd.get("detailedHtmlLink") || "",
+          description: fd.get("description") || ""
         };
-        var btn = this.querySelector('button[type="submit"]');
+        var btn = form.querySelector('button[type="submit"]');
         btn.disabled = true;
         btn.textContent = "Adding…";
-        fetch(API + "/api/plants", {
+        fetch(API_BASE + "/api/plants", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         }).then(function (r) {
-          if (r.ok) { window.location.href = "plants.html"; return; }
+          if (r.ok) {
+            try {
+              localStorage.setItem("plantQrCloudLinks", JSON.stringify({
+                basicHtmlLink: body.basicHtmlLink || "",
+                detailedHtmlLink: body.detailedHtmlLink || ""
+              }));
+            } catch (_) {}
+            savedLinksList.innerHTML = "";
+            [
+              { label: "Basic HTML", url: body.basicHtmlLink },
+              { label: "Detailed HTML", url: body.detailedHtmlLink }
+            ].forEach(function (item) {
+              if (!item.url) { return; }
+              var li = document.createElement("li");
+              var a = document.createElement("a");
+              a.href = item.url;
+              a.target = "_blank";
+              a.rel = "noopener noreferrer";
+              a.textContent = item.label + ": " + item.url;
+              li.appendChild(a);
+              savedLinksList.appendChild(li);
+            });
+            if (!savedLinksList.children.length) {
+              var li = document.createElement("li");
+              li.textContent = "No links were provided.";
+              savedLinksList.appendChild(li);
+            }
+            savedLinksPreview.style.display = "block";
+            alert("Plant saved successfully.");
+            setTimeout(function () { window.location.href = "plants.html"; }, 1200);
+            return;
+          }
           return r.json().then(function (d) { throw new Error(d.error || "Failed to add plant"); });
         }).catch(function (err) {
           btn.disabled = false;
-          btn.textContent = "Add Plant";
+          btn.textContent = "Save Plant";
           alert(err.message || "Failed to add plant. Is the server running?");
         });
       });

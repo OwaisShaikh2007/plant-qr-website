@@ -87,11 +87,13 @@
                   Description for this plant has not been added yet.
                 </p>
               </div>
-
-              <div class="care-section">
-                <h3>Care Information</h3>
-                <p id="plantCareInfo" style="white-space:pre-wrap;">
-                  Care information has not been added yet.
+              <div class="guide-section" id="guideSection" style="display:none;">
+                <h3>Guides</h3>
+                <p>
+                  <a id="basicGuideLink" href="#" target="_blank" rel="noopener" style="display:none;">Open basic guide</a>
+                </p>
+                <p>
+                  <a id="detailedGuideLink" href="#" target="_blank" rel="noopener" style="display:none;">Open detailed guide</a>
                 </p>
               </div>
             </div>
@@ -103,8 +105,8 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var API = "https://plant-qr-website-production.up.railway.app";
-
+      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -124,7 +126,7 @@
         return;
       }
 
-      fetch(API + "/api/plants/" + id)
+      fetch(API_BASE + "/api/plants/" + id)
         .then(function (r) { return r.json(); })
         .then(function (p) {
           if (!p || p.error) {
@@ -163,8 +165,23 @@
           var desc = document.getElementById("plantDescription");
           if (desc && p.description) desc.textContent = p.description;
 
-          var care = document.getElementById("plantCareInfo");
-          if (care && p.careInfo) care.textContent = p.careInfo;
+          var guideSection = document.getElementById("guideSection");
+          var basicGuideLink = document.getElementById("basicGuideLink");
+          var detailedGuideLink = document.getElementById("detailedGuideLink");
+          var hasGuide = false;
+          if (basicGuideLink && p.basicHtmlLink) {
+            basicGuideLink.href = p.basicHtmlLink;
+            basicGuideLink.style.display = "";
+            hasGuide = true;
+          }
+          if (detailedGuideLink && p.detailedHtmlLink) {
+            detailedGuideLink.href = p.detailedHtmlLink;
+            detailedGuideLink.style.display = "";
+            hasGuide = true;
+          }
+          if (guideSection) {
+            guideSection.style.display = hasGuide ? "" : "none";
+          }
 
           // Map link for location / coordinates
           var mapRow = document.getElementById("mapLinkRow");
