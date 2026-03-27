@@ -105,8 +105,7 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -127,7 +126,10 @@
       }
 
       fetch(API_BASE + "/api/plants/" + id)
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+          if (!r.ok) throw new Error("Could not load plant.");
+          return r.json();
+        })
         .then(function (p) {
           if (!p || p.error) {
             showError();

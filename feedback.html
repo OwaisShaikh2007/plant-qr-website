@@ -74,7 +74,17 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
       function loadReplies() {
         var email = document.getElementById("fbEmail").value.trim();
         var phone = document.getElementById("fbPhone").value.trim() || (window.userPhone || "");
@@ -82,11 +92,11 @@
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your email or phone to see admin replies.</p>";
           return;
         }
-        var url = API + "/api/my-messages?type=feedback";
+        var url = API_BASE + "/api/my-messages?type=feedback";
         if (email) url += "&email=" + encodeURIComponent(email);
         if (phone) url += "&phone=" + encodeURIComponent(phone);
         fetch(url)
-          .then(function (r) { return r.json(); })
+          .then(toJsonOrThrow)
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.adminReply; });
             var list = document.getElementById("repliesList");
@@ -127,7 +137,7 @@
         var msgEl = document.getElementById("feedbackMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API + "/api/feedback", {
+        fetch(API_BASE + "/api/feedback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -136,24 +146,19 @@
             phone: document.getElementById("fbPhone").value.trim(),
             message: document.getElementById("fbMessage").value.trim()
           })
-        }).then(function (r) { return r.json(); })
+        }).then(toJsonOrThrow)
           .then(function (data) {
             msgEl.style.display = "block";
-            if (data.error) {
-              msgEl.className = "error-message";
-              msgEl.textContent = data.error;
-            } else {
-              msgEl.className = "otp-success";
-              msgEl.textContent = data.message || "Thank you for your feedback.";
-              document.getElementById("feedbackForm").reset();
-              setTimeout(loadReplies, 500);
-            }
+            msgEl.className = "otp-success";
+            msgEl.textContent = data.message || "Thank you for your feedback.";
+            document.getElementById("feedbackForm").reset();
+            setTimeout(loadReplies, 500);
             btn.disabled = false;
           })
-          .catch(function () {
+          .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = "Could not submit. Is the server running?";
+            msgEl.textContent = err.message || "Could not submit.";
             btn.disabled = false;
           });
       });

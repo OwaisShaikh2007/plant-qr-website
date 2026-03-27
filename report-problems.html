@@ -81,15 +81,25 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
       function loadReplies() {
         var name = document.getElementById("repName").value.trim();
         if (!name) {
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your name to see admin replies.</p>";
           return;
         }
-        fetch(API + "/api/my-messages?type=report")
-          .then(function (r) { return r.json(); })
+        fetch(API_BASE + "/api/my-messages?type=report")
+          .then(toJsonOrThrow)
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.name && m.name.toLowerCase() === name.toLowerCase() && m.adminReply; });
             var list = document.getElementById("repliesList");
@@ -128,7 +138,7 @@
         var msgEl = document.getElementById("reportMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API + "/api/reports", {
+        fetch(API_BASE + "/api/reports", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -137,24 +147,19 @@
             problemType: document.getElementById("repType").value,
             message: document.getElementById("repMessage").value.trim()
           })
-        }).then(function (r) { return r.json(); })
+        }).then(toJsonOrThrow)
           .then(function (data) {
             msgEl.style.display = "block";
-            if (data.error) {
-              msgEl.className = "error-message";
-              msgEl.textContent = data.error;
-            } else {
-              msgEl.className = "otp-success";
-              msgEl.textContent = data.message || "Report submitted. Thank you.";
-              document.getElementById("reportForm").reset();
-              setTimeout(loadReplies, 500);
-            }
+            msgEl.className = "otp-success";
+            msgEl.textContent = data.message || "Report submitted. Thank you.";
+            document.getElementById("reportForm").reset();
+            setTimeout(loadReplies, 500);
             btn.disabled = false;
           })
-          .catch(function () {
+          .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = "Could not submit. Is the server running?";
+            msgEl.textContent = err.message || "Could not submit.";
             btn.disabled = false;
           });
       });

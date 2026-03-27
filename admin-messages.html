@@ -104,7 +104,17 @@
         return;
       }
 
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
       var messages = [];
       var filteredMessages = [];
 
@@ -201,8 +211,8 @@
       }
 
       function loadMessages() {
-        fetch(API + "/api/messages")
-          .then(function (r) { return r.json(); })
+        fetch(API_BASE + "/api/messages")
+          .then(toJsonOrThrow)
           .then(function (data) {
             messages = data || [];
             filterMessages();
@@ -263,31 +273,26 @@
         }
 
         btn.disabled = true;
-        fetch(API + "/api/messages/" + messageId + "/reply", {
+        fetch(API_BASE + "/api/messages/" + messageId + "/reply", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ reply: replyText })
         })
-          .then(function (r) { return r.json(); })
+          .then(toJsonOrThrow)
           .then(function (data) {
             msgEl.style.display = "block";
-            if (data.error) {
-              msgEl.className = "error-message";
-              msgEl.textContent = data.error;
-            } else {
-              msgEl.className = "otp-success";
-              msgEl.textContent = data.message || "Reply sent successfully.";
-              setTimeout(function () {
-                closeReplyModal();
-                loadMessages();
-              }, 1500);
-            }
+            msgEl.className = "otp-success";
+            msgEl.textContent = data.message || "Reply sent successfully.";
+            setTimeout(function () {
+              closeReplyModal();
+              loadMessages();
+            }, 1500);
             btn.disabled = false;
           })
-          .catch(function () {
+          .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = "Could not send reply. Is the server running?";
+            msgEl.textContent = err.message || "Could not send reply.";
             btn.disabled = false;
           });
       });

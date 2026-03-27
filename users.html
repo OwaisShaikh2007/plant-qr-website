@@ -67,7 +67,17 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
       var usersList = [];
 
       function escapeHtml(s) {
@@ -97,8 +107,8 @@
         }).join("");
       }
 
-      fetch(API + "/api/users")
-        .then(function (r) { return r.json(); })
+      fetch(API_BASE + "/api/users")
+        .then(toJsonOrThrow)
         .then(function (list) {
           usersList = Array.isArray(list) ? list : [];
           renderUsers();
@@ -150,7 +160,7 @@
 
         btn.disabled = true;
 
-        fetch(API + "/api/users", {
+        fetch(API_BASE + "/api/users", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -162,29 +172,24 @@
             role: role
           })
         })
-          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
-          .then(function (res) {
+          .then(toJsonOrThrow)
+          .then(function (data) {
             msgEl.style.display = "block";
-            if (!res.ok || res.data.error) {
-              msgEl.className = "error-message";
-              msgEl.textContent = res.data.error || "Failed to update user.";
-            } else {
-              msgEl.className = "otp-success";
-              msgEl.textContent = res.data.message || "User updated successfully.";
-              if (usersList[index]) {
-                usersList[index] = res.data.user || usersList[index];
-              }
-              renderUsers();
-              setTimeout(function () {
-                closeEditUserModal();
-              }, 1200);
+            msgEl.className = "otp-success";
+            msgEl.textContent = data.message || "User updated successfully.";
+            if (usersList[index]) {
+              usersList[index] = data.user || usersList[index];
             }
+            renderUsers();
+            setTimeout(function () {
+              closeEditUserModal();
+            }, 1200);
             btn.disabled = false;
           })
-          .catch(function () {
+          .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = "Could not update user. Is the server running?";
+            msgEl.textContent = err.message || "Could not update user.";
             btn.disabled = false;
           });
       });

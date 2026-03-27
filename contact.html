@@ -85,7 +85,17 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
       function loadReplies() {
         var email = document.getElementById("conEmail").value.trim();
         var phone = document.getElementById("conPhone").value.trim() || (window.userPhone || "");
@@ -93,11 +103,11 @@
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your email or phone to see admin replies.</p>";
           return;
         }
-        var url = API + "/api/my-messages?type=contact";
+        var url = API_BASE + "/api/my-messages?type=contact";
         if (email) url += "&email=" + encodeURIComponent(email);
         if (phone) url += "&phone=" + encodeURIComponent(phone);
         fetch(url)
-          .then(function (r) { return r.json(); })
+          .then(toJsonOrThrow)
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.adminReply; });
             var list = document.getElementById("repliesList");
@@ -138,7 +148,7 @@
         var msgEl = document.getElementById("contactMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API + "/api/contact", {
+        fetch(API_BASE + "/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -147,24 +157,19 @@
             phone: document.getElementById("conPhone").value.trim(),
             message: document.getElementById("conMessage").value.trim()
           })
-        }).then(function (r) { return r.json(); })
+        }).then(toJsonOrThrow)
           .then(function (data) {
             msgEl.style.display = "block";
-            if (data.error) {
-              msgEl.className = "error-message";
-              msgEl.textContent = data.error;
-            } else {
-              msgEl.className = "otp-success";
-              msgEl.textContent = data.message || "Message sent. We will get back to you.";
-              document.getElementById("contactForm").reset();
-              setTimeout(loadReplies, 500);
-            }
+            msgEl.className = "otp-success";
+            msgEl.textContent = data.message || "Message sent. We will get back to you.";
+            document.getElementById("contactForm").reset();
+            setTimeout(loadReplies, 500);
             btn.disabled = false;
           })
-          .catch(function () {
+          .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = "Could not send. Is the server running?";
+            msgEl.textContent = err.message || "Could not send.";
             btn.disabled = false;
           });
       });

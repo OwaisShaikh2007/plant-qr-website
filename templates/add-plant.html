@@ -99,8 +99,7 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
       document.getElementById("addPlantForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var fd = new FormData(this);
@@ -120,8 +119,15 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         }).then(function (r) {
-          if (r.ok) { window.location.href = "plants.html"; return; }
-          return r.json().then(function (d) { throw new Error(d.error || "Failed to add plant"); });
+          if (!r.ok) {
+            return r.json().then(function (d) {
+              throw new Error((d && d.error) || "Failed to add plant");
+            }).catch(function () {
+              throw new Error("Failed to add plant");
+            });
+          }
+          window.location.href = "plants.html";
+          return;
         }).catch(function (err) {
           btn.disabled = false;
           btn.textContent = "Add Plant";

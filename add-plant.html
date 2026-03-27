@@ -145,8 +145,7 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
       var form = document.getElementById("addPlantForm");
       var stepBasicInfo = document.getElementById("stepBasicInfo");
       var stepCloudSaving = document.getElementById("stepCloudSaving");
@@ -281,6 +280,13 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         }).then(function (r) {
+          if (!r.ok) {
+            return r.json().then(function (d) {
+              throw new Error((d && d.error) || "Failed to add plant");
+            }).catch(function () {
+              throw new Error("Failed to add plant");
+            });
+          }
           if (r.ok) {
             try {
               localStorage.setItem("plantQrCloudLinks", JSON.stringify({
@@ -313,7 +319,6 @@
             setTimeout(function () { window.location.href = "plants.html"; }, 1200);
             return;
           }
-          return r.json().then(function (d) { throw new Error(d.error || "Failed to add plant"); });
         }).catch(function (err) {
           btn.disabled = false;
           btn.textContent = "Save Plant";

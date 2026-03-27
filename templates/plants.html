@@ -60,8 +60,7 @@
   <script>
     (function () {
       var isAdmin = window.userRole === "admin";
-      var isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      var API_BASE = isLocalhost ? "" : "https://plant-qr-website-production.up.railway.app";
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
 
       function getDetailsPage(id) {
         var num = parseInt(id, 10);
@@ -107,7 +106,10 @@
             var name = btn.getAttribute("data-name");
             if (!confirm("Remove tree \"" + name + "\"? This cannot be undone.")) return;
             fetch(API_BASE + "/api/plants/" + id, { method: "DELETE" })
-              .then(function (r) { return r.json(); })
+              .then(function (r) {
+                if (!r.ok) throw new Error("Failed to remove plant.");
+                return r.json();
+              })
               .then(function () { load(); })
               .catch(function () { alert("Failed to remove. Is the server running?"); });
           });
@@ -115,7 +117,10 @@
       }
       function load() {
         fetch(API_BASE + "/api/plants")
-          .then(function (r) { return r.json(); })
+          .then(function (r) {
+            if (!r.ok) throw new Error("Could not load plants.");
+            return r.json();
+          })
           .then(render)
           .catch(function () {
             document.getElementById("plantsGrid").innerHTML = "<p class=\"no-results\" style=\"grid-column:1/-1;\">Could not load plants. Start the server: npm start</p>";
