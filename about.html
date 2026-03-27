@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>User Portal</p>
+        <div class="user-badge"><span class="user-role-icon">U</span><span class="user-name">User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link active"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="card">
+          <div class="page-header" style="margin-bottom:24px;">
+            <div>
+              <h1>About</h1>
+              <p>About the Plant QR system and the administrator.</p>
+            </div>
+          </div>
+          <div class="about-content" style="line-height:1.8;">
+            <h2 style="font-size:1.3rem;margin-bottom:12px;">About the system</h2>
+            <p>Plant QR is a campus plant and tree information system. You can browse trees added in the campus, see their locations on a map, and view details. The system is managed by the campus administrator.</p>
+
+            <h2 style="font-size:1.3rem;margin:24px 0 12px;">About the administrator</h2>
+            <p>The administrator manages user access, adds and removes trees, and maintains tree data and locations. For any questions, feedback, or to report a problem, use the <a href="feedback.html">Feedback</a>, <a href="report-problems.html">Report problems</a>, or <a href="contact.html">Contact</a> pages.</p>
+
+            <h2 style="font-size:1.3rem;margin:24px 0 12px;">Contact the admin</h2>
+            <p style="margin-bottom:8px;"><strong>Admin 1</strong></p>
+            <p><strong>Email:</strong> owaiszaid2007@gmail.com &nbsp;|&nbsp; <strong>Phone:</strong> 7249711548</p>
+            <p style="margin-top:12px;margin-bottom:8px;"><strong>Admin 2</strong></p>
+            <p><strong>Email:</strong> manthanwaingankar@gmail.com &nbsp;|&nbsp; <strong>Phone:</strong> 7822916911</p>
+
+            <p style="margin-top:32px;color:var(--text-secondary);font-size:0.95rem;">Plant QR System – Campus tree information &amp; GPS locations.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    if (window.userRole === "admin") window.location.href = "dashboard.html";
+  </script>
+</body>
+</html>

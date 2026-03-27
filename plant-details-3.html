@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gulmohar Tree - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="plant-details">
+          <div class="page-header">
+            <div>
+              <a href="plants.html" class="back-link">← Back to Plants</a>
+              <h1>Gulmohar Tree</h1>
+              <p class="scientific-name">Delonix regia</p>
+            </div>
+            <div class="header-actions">
+              <a href="edit-plant.html?id=3" class="btn btn-outline admin-only">Edit</a>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="main-info card">
+              <div class="card-header">
+                <h2>Plant Information</h2>
+                <span class="badge badge-active">Active</span>
+              </div>
+              <div class="info-section">
+                <div class="info-row"><span class="info-label">Location:</span><span class="info-value">COLLEGE CAMPUS</span></div>
+                <div class="info-row"><span class="info-label">🌍 Coordinates:</span><span class="info-value">—</span></div>
+                <div class="info-row"><span class="info-label">🎂 Age:</span><span class="info-value">Varies (ornamental)</span></div>
+                <div class="info-row"><span class="info-label">Date Added:</span><span class="info-value">2026-03-05</span></div>
+                <div class="info-row" id="mapLinkRow" style="display:none;">
+                  <span class="info-label">Map:</span>
+                  <span class="info-value">
+                    <a id="mapLink" href="#" target="_blank" rel="noopener">View on Google Maps</a>
+                  </span>
+                </div>
+              </div>
+              <div class="description-section">
+                <h3>Description</h3>
+                <p>
+                  The Gulmohar tree (<em>Delonix regia</em>), also known as the Flame Tree, is a deciduous
+                  <strong>ornamental flowering tree</strong> prized for its bright red‑orange blossoms and broad, umbrella‑shaped canopy.
+                  It thrives in warm tropical climates and is widely planted along avenues, roadsides, campuses, and parks.
+                </p>
+              </div>
+              <div class="care-section">
+                <h3>Care Information</h3>
+                <p>
+                  <a href="https://drive.google.com/file/d/1wPuRYKehAH4xe35K8R4Qyc6QOGRV3ala/view?usp=sharing" target="_blank" rel="noopener">
+                    View Care Information (PDF)
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      var API = "https://plant-qr-website-production.up.railway.app";
+      var PLANT_ID = 3;
+
+      function setText(selector, value) {
+        if (!value) return;
+        var el = document.querySelector(selector);
+        if (el) el.textContent = value;
+      }
+
+      function setInfo(labelText, value) {
+        if (value == null || value === "") return;
+        var rows = document.querySelectorAll(".info-section .info-row");
+        for (var i = 0; i < rows.length; i++) {
+          var lbl = rows[i].querySelector(".info-label");
+          if (!lbl) continue;
+          if (lbl.textContent.indexOf(labelText) !== -1) {
+            var valEl = rows[i].querySelector(".info-value");
+            if (valEl) valEl.textContent = value;
+            break;
+          }
+        }
+      }
+
+      fetch(API + "/api/plants/" + PLANT_ID)
+        .then(function (r) { return r.json(); })
+        .then(function (p) {
+          if (!p || p.error) return;
+          setText(".plant-details .page-header h1", p.name || "Gulmohar Tree");
+          setText(".plant-details .page-header .scientific-name", p.scientificName || "Delonix regia");
+          setInfo("Location", p.location);
+          setInfo("Coordinates", p.coordinates);
+          setInfo("Age", p.age);
+          setInfo("Date Added", p.dateAdded);
+          if (p.description) {
+            var desc = document.querySelector(".description-section p");
+            if (desc) desc.textContent = p.description;
+          }
+          // Map link for location / coordinates
+          var mapRow = document.getElementById("mapLinkRow");
+          var mapLink = document.getElementById("mapLink");
+          if (mapRow && mapLink) {
+            var query = (p.coordinates && p.coordinates.trim()) || (p.location && p.location.trim()) || (p.name && p.name.trim());
+            if (query) {
+              var url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+              mapLink.href = url;
+              mapRow.style.display = "";
+            } else {
+              mapRow.style.display = "none";
+            }
+          }
+        })
+        .catch(function () {
+          // ignore – page will show default static content
+        });
+    })();
+  </script>
+</body>
+</html>
+

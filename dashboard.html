@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p id="sidebarPanelLabel">Admin Panel</p>
+        <div class="user-badge">
+          <span class="user-role-icon">A</span>
+          <span class="user-name">Admin User</span>
+        </div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link active"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="user-only"><a href="user-guide.html" class="nav-link"><span class="icon"></span><span>User Guide</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <div class="header">
+              <button id="menuBtn">☰</button>
+              <h1>Dashboard</h1>
+            </div>
+            <p id="dashboardWelcome">Welcome back to the Plant QR system.</p>
+          </div>
+
+          <div class="dashboard-content">
+            <div class="card">
+              <div class="card-header">
+                <h2>Recent Plants</h2>
+                <a href="plants.html" class="btn btn-outline btn-sm">View All</a>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Plant Name</th>
+                      <th>Location</th>
+                      <th>Date Added</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Mango Tree</strong></td>
+                      <td>COLLEGE CAMPUS</td>
+                      <td>2026-03-05</td>
+                      <td><span class="badge badge-success">Active</span></td>
+                      <td><a href="plant-details-1.html" class="btn-link">View</a></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Almond Tree</strong></td>
+                      <td>COLLEGE CAMPUS</td>
+                      <td>2026-03-05</td>
+                      <td><span class="badge badge-success">Active</span></td>
+                      <td><a href="plant-details-2.html" class="btn-link">View</a></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Gulmohar Tree</strong></td>
+                      <td>COLLEGE CAMPUS</td>
+                      <td>2026-03-05</td>
+                      <td><span class="badge badge-success">Active</span></td>
+                      <td><a href="plant-details-3.html" class="btn-link">View</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- User only: History of trees added -->
+            <div class="user-only" id="userTreeHistorySection" style="display:none;">
+              <div class="card">
+                <div class="card-header">
+                  <h2>History – Trees added in campus</h2>
+                  <a href="plants.html" class="btn btn-outline btn-sm">View all</a>
+                </div>
+                <div class="table-container">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tree name</th>
+                        <th>Location</th>
+                        <th>Date added</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="userTreeHistoryBody">
+                      <tr><td colspan="4" class="text-center">Loading…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- User only: GPS / Tree locations in campus -->
+            <div class="user-only" id="userTreeLocationsSection" style="display:none;">
+              <div class="card">
+                <div class="card-header">
+                  <h2>Tree locations (GPS) – Campus map</h2>
+                </div>
+                <p style="color:var(--text-secondary);margin-bottom:16px;">Click “View on map” to see the tree location in Google Maps.</p>
+                <div id="userTreeLocationsList" class="tree-locations-list">
+                  <p class="text-center">Loading…</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script>
+    (function () {
+      var role = window.userRole || "admin";
+      var name = window.userName || "User";
+      var isAdmin = role === "admin";
+      var welcome = document.getElementById("dashboardWelcome");
+      if (welcome) welcome.textContent = isAdmin
+        ? "Welcome back, Administrator! Here's your plant QR system overview."
+        : "Welcome, " + name + "! Browse plants and tree locations here.";
+      var historySection = document.getElementById("userTreeHistorySection");
+      var locationsSection = document.getElementById("userTreeLocationsSection");
+      if (historySection) historySection.style.display = isAdmin ? "none" : "";
+      if (locationsSection) locationsSection.style.display = isAdmin ? "none" : "";
+
+      var stats = document.getElementById("dashboardStats");
+      if (stats && !isAdmin) {
+        stats.style.display = "none";
+      }
+
+      if (!isAdmin) {
+        var API = "https://plant-qr-website-production.up.railway.app";
+        fetch(API + "/api/plants")
+          .then(function (r) { return r.json(); })
+          .then(function (list) {
+            if (!Array.isArray(list)) return;
+            var sorted = list.slice().sort(function (a, b) {
+              return (b.dateAdded || "").localeCompare(a.dateAdded || "");
+            });
+            var historyBody = document.getElementById("userTreeHistoryBody");
+            if (historyBody) {
+              if (sorted.length === 0) {
+                historyBody.innerHTML = "<tr><td colspan=\"4\" class=\"text-center\">No trees added yet.</td></tr>";
+              } else {
+                historyBody.innerHTML = sorted.map(function (p) {
+                  return "<tr><td><strong>" + escapeHtml(p.name || "—") + "</strong></td><td>" + escapeHtml(p.location || "—") + "</td><td>" + escapeHtml(p.dateAdded || "—") + "</td><td><span class=\"badge badge-success\">" + (p.status || "Active") + "</span></td></tr>";
+                }).join("");
+              }
+            }
+            var locationsList = document.getElementById("userTreeLocationsList");
+            if (locationsList) {
+              if (sorted.length === 0) {
+                locationsList.innerHTML = "<p class=\"text-center\">No tree locations available.</p>";
+              } else {
+                var query = function (p) {
+                  if (p.coordinates) {
+                    var m = p.coordinates.match(/([\d.-]+)[^0-9]*([\d.-]+)/);
+                    if (m) return m[1].trim() + "," + m[2].trim();
+                  }
+                  return p.location || p.name || "";
+                };
+                locationsList.innerHTML = "<div class=\"tree-location-cards\">" + sorted.map(function (p) {
+                  var q = query(p);
+                  var mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+                  return "<div class=\"tree-location-item\"><div class=\"tree-location-name\">" + escapeHtml(p.name || "Tree") + "</div><div class=\"tree-location-place\">" + escapeHtml(p.location || "—") + (p.coordinates ? " <span class=\"tree-coords\">(" + escapeHtml(p.coordinates) + ")</span>" : "") + "</div><a href=\"" + mapUrl + "\" target=\"_blank\" rel=\"noopener\" class=\"btn btn-outline btn-sm\">View on map</a></div>";
+                }).join("") + "</div>";
+              }
+            }
+          })
+          .catch(function () {
+            var historyBody = document.getElementById("userTreeHistoryBody");
+            if (historyBody) historyBody.innerHTML = "<tr><td colspan=\"4\" class=\"text-center\">Could not load. Is the server running?</td></tr>";
+            var locationsList = document.getElementById("userTreeLocationsList");
+            if (locationsList) locationsList.innerHTML = "<p class=\"text-center\">Could not load locations. Start the server (npm start).</p>";
+          });
+      }
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        var d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      var btn = document.getElementById("menuBtn");
+      var sidebar = document.querySelector(".sidebar");
+      if (!btn || !sidebar) return;
+      btn.onclick = function () {
+        sidebar.classList.toggle("active");
+      };
+    })();
+  </script>
+</body>
+</html>

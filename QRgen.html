@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 50px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #qr {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>QR Code Generator</h2>
+
+    <input type="text" id="link" placeholder="Enter any link">
+    <br>
+    <button onclick="generateQR()">Generate</button>
+
+    <div id="qr"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+function generateQR() {
+    let link = document.getElementById("link").value.trim();
+    let qrDiv = document.getElementById("qr");
+
+    if (link === "") {
+        alert("Enter a link!");
+        return;
+    }
+
+    qrDiv.innerHTML = ""; // clear old QR
+
+    new QRCode(qrDiv, {
+        text: link,
+        width: 200,
+        height: 200
+    });
+}
+</script>
+
+</body>
+</html>
