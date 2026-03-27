@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Generator - Plant QR System</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Plant QR</h2>
+        <p>Admin Panel</p>
+        <div class="user-badge"><span class="user-role-icon">A</span><span class="user-name">Admin User</span></div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="dashboard.html" class="nav-link"><span class="icon"></span><span>Dashboard</span></a></li>
+        <li class="admin-only"><a href="users.html" class="nav-link"><span class="icon"></span><span>User Credentials</span></a></li>
+        <li><a href="plants.html" class="nav-link"><span class="icon"></span><span>Plants</span></a></li>
+        <li class="admin-only"><a href="add-plant.html" class="nav-link"><span class="icon"></span><span>Add Plant</span></a></li>
+        <li class="admin-only"><a href="admin-messages.html" class="nav-link"><span class="icon"></span><span>Messages</span></a></li>
+        <li class="admin-only"><a href="qr-center.html" class="nav-link active"><span class="icon"></span><span>QR Generator</span></a></li>
+        <li class="user-only"><a href="feedback.html" class="nav-link"><span class="icon"></span><span>Feedback</span></a></li>
+        <li class="user-only"><a href="report-problems.html" class="nav-link"><span class="icon"></span><span>Report problems</span></a></li>
+        <li class="user-only"><a href="contact.html" class="nav-link"><span class="icon"></span><span>Contact</span></a></li>
+        <li class="user-only"><a href="about.html" class="nav-link"><span class="icon"></span><span>About</span></a></li>
+        <li><a href="profile.html" class="nav-link"><span class="icon"></span><span>Profile</span></a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="index.html" class="btn-logout" style="text-decoration:none;color:inherit;text-align:center;"><span class="icon"></span><span>Logout</span></a>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="dashboard">
+          <div style="display:flex;flex-direction:column;align-items:center;width:100%;padding:24px 0 32px;">
+            <div class="card" style="max-width:480px;width:100%;">
+              <div class="card-header" style="text-align:center;">
+                <h2 style="margin:0;">QR Generator</h2>
+              </div>
+              <div class="form-group">
+                <label for="qrLink">Link</label>
+                <input type="url" id="qrLink" class="form-control" placeholder="Paste any URL..." />
+              </div>
+              <div class="form-actions" style="justify-content:center;">
+                <button type="button" id="generateQrBtn" class="btn btn-primary">Generate QR</button>
+              </div>
+              <div id="qrResult" style="margin-top:14px;display:flex;justify-content:center;align-items:center;min-height:220px;"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:20px;">
+            <div class="card-header">
+              <h2>All Feedback & Reports</h2>
+            </div>
+            <div id="frState" class="text-center" style="padding:8px 0 14px;">Loading…</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="frBody">
+                  <tr><td colspan="5" class="text-center">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    (function () {
+      if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
+      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+
+      function toJsonOrThrow(r) {
+        if (!r.ok) {
+          return r.json().then(function (d) {
+            throw new Error((d && d.error) || "Request failed.");
+          }).catch(function () {
+            throw new Error("Request failed.");
+          });
+        }
+        return r.json();
+      }
+
+      var qrBtn = document.getElementById("generateQrBtn");
+      var qrLink = document.getElementById("qrLink");
+      var qrResult = document.getElementById("qrResult");
+      qrBtn.addEventListener("click", function () {
+        var url = (qrLink.value || "").trim();
+        if (!url) { alert("Enter a link first."); return; }
+        qrResult.innerHTML = "";
+        new QRCode(qrResult, { text: url, width: 200, height: 200 });
+      });
+
+      fetch(API_BASE + "/api/messages")
+        .then(toJsonOrThrow)
+        .then(function (list) {
+          var rows = (Array.isArray(list) ? list : []).filter(function (m) {
+            return m.type === "feedback" || m.type === "report";
+          });
+          document.getElementById("frState").style.display = "none";
+          var body = document.getElementById("frBody");
+          if (!rows.length) {
+            body.innerHTML = "<tr><td colspan=\"5\" class=\"text-center\">No feedback or reports yet.</td></tr>";
+            return;
+          }
+          body.innerHTML = rows.map(function (m) {
+            var date = m.at ? new Date(m.at).toLocaleString() : "—";
+            var status = m.adminReply ? "Replied" : "Pending";
+            return "<tr>" +
+              "<td>" + (m.type === "feedback" ? "Feedback" : "Report") + "</td>" +
+              "<td>" + (m.name || "Anonymous") + "</td>" +
+              "<td style=\"max-width:460px;white-space:normal;\">" + (m.message || "—") + "</td>" +
+              "<td>" + status + "</td>" +
+              "<td>" + date + "</td>" +
+              "</tr>";
+          }).join("");
+        })
+        .catch(function (err) {
+          document.getElementById("frState").textContent = err.message || "Could not load messages.";
+          document.getElementById("frBody").innerHTML = "<tr><td colspan=\"5\" class=\"text-center\">Could not load feedback/reports.</td></tr>";
+        });
+    })();
+  </script>
+</body>
+</html>
