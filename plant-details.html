@@ -164,6 +164,94 @@
         if (details) details.style.display = "none";
         if (err) err.style.display = "block";
       }
+      function renderPlant(p, id) {
+        if (!p || p.error) {
+          showError();
+          return;
+        }
+
+        var details = document.getElementById("detailsBlock");
+        if (details) details.style.display = "";
+
+        var h1 = document.getElementById("plantNameHeading");
+        if (h1) h1.textContent = p.name || "Plant";
+
+        var sci = document.getElementById("plantScientificName");
+        if (sci) sci.textContent = p.scientificName || "";
+
+        var statusBadge = document.getElementById("statusBadge");
+        if (statusBadge) {
+          var status = p.status || "Active";
+          statusBadge.textContent = status;
+          if (status === "Inactive") {
+            statusBadge.classList.remove("badge-active");
+            statusBadge.classList.add("badge-inactive");
+          }
+        }
+
+        var loc = document.getElementById("infoLocation");
+        if (loc) loc.textContent = p.location || "—";
+        var coords = document.getElementById("infoCoordinates");
+        if (coords) coords.textContent = p.coordinates || "—";
+        var age = document.getElementById("infoAge");
+        if (age) age.textContent = p.age || "—";
+        var dateAdded = document.getElementById("infoDateAdded");
+        if (dateAdded) dateAdded.textContent = p.dateAdded || "—";
+
+        var desc = document.getElementById("plantDescription");
+        if (desc && p.description) desc.textContent = p.description;
+
+        var guideSection = document.getElementById("guideSection");
+        var basicGuideLink = document.getElementById("basicGuideLink");
+        var detailedGuideLink = document.getElementById("detailedGuideLink");
+        var hasGuide = false;
+        if (basicGuideLink && p.basicHtmlLink) {
+          basicGuideLink.href = p.basicHtmlLink;
+          basicGuideLink.style.display = "";
+          hasGuide = true;
+        }
+        if (detailedGuideLink && p.detailedHtmlLink) {
+          detailedGuideLink.href = p.detailedHtmlLink;
+          detailedGuideLink.style.display = "";
+          hasGuide = true;
+        }
+        if (guideSection) {
+          guideSection.style.display = hasGuide ? "" : "none";
+        }
+
+        // Map link for location / coordinates
+        var mapRow = document.getElementById("mapLinkRow");
+        var mapLink = document.getElementById("mapLink");
+        if (mapRow && mapLink) {
+          var query = (p.coordinates && p.coordinates.trim()) || (p.location && p.location.trim()) || (p.name && p.name.trim());
+          if (query) {
+            var url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
+            mapLink.href = url;
+            mapRow.style.display = "";
+          } else {
+            mapRow.style.display = "none";
+          }
+        }
+
+        if (window.userRole === "admin") {
+          var edit = document.getElementById("editLink");
+          if (edit) {
+            edit.style.display = "";
+            edit.href = "edit-plant.html?id=" + encodeURIComponent(id);
+          }
+        }
+      }
+      function getRecentlyAddedPlantFor(id) {
+        try {
+          var raw = sessionStorage.getItem("recentlyAddedPlant");
+          if (!raw) return null;
+          var p = JSON.parse(raw);
+          if (!p || !p.id) return null;
+          return Number(p.id) === Number(id) ? p : null;
+        } catch (e) {
+          return null;
+        }
+      }
 
       var id = getPlantId();
       if (!id) {
@@ -173,83 +261,15 @@
 
       fetchPlantByIdWithFallback(id)
         .then(function (p) {
-          if (!p || p.error) {
-            showError();
-            return;
-          }
-
-          var details = document.getElementById("detailsBlock");
-          if (details) details.style.display = "";
-
-          var h1 = document.getElementById("plantNameHeading");
-          if (h1) h1.textContent = p.name || "Plant";
-
-          var sci = document.getElementById("plantScientificName");
-          if (sci) sci.textContent = p.scientificName || "";
-
-          var statusBadge = document.getElementById("statusBadge");
-          if (statusBadge) {
-            var status = p.status || "Active";
-            statusBadge.textContent = status;
-            if (status === "Inactive") {
-              statusBadge.classList.remove("badge-active");
-              statusBadge.classList.add("badge-inactive");
-            }
-          }
-
-          var loc = document.getElementById("infoLocation");
-          if (loc) loc.textContent = p.location || "—";
-          var coords = document.getElementById("infoCoordinates");
-          if (coords) coords.textContent = p.coordinates || "—";
-          var age = document.getElementById("infoAge");
-          if (age) age.textContent = p.age || "—";
-          var dateAdded = document.getElementById("infoDateAdded");
-          if (dateAdded) dateAdded.textContent = p.dateAdded || "—";
-
-          var desc = document.getElementById("plantDescription");
-          if (desc && p.description) desc.textContent = p.description;
-
-          var guideSection = document.getElementById("guideSection");
-          var basicGuideLink = document.getElementById("basicGuideLink");
-          var detailedGuideLink = document.getElementById("detailedGuideLink");
-          var hasGuide = false;
-          if (basicGuideLink && p.basicHtmlLink) {
-            basicGuideLink.href = p.basicHtmlLink;
-            basicGuideLink.style.display = "";
-            hasGuide = true;
-          }
-          if (detailedGuideLink && p.detailedHtmlLink) {
-            detailedGuideLink.href = p.detailedHtmlLink;
-            detailedGuideLink.style.display = "";
-            hasGuide = true;
-          }
-          if (guideSection) {
-            guideSection.style.display = hasGuide ? "" : "none";
-          }
-
-          // Map link for location / coordinates
-          var mapRow = document.getElementById("mapLinkRow");
-          var mapLink = document.getElementById("mapLink");
-          if (mapRow && mapLink) {
-            var query = (p.coordinates && p.coordinates.trim()) || (p.location && p.location.trim()) || (p.name && p.name.trim());
-            if (query) {
-              var url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query);
-              mapLink.href = url;
-              mapRow.style.display = "";
-            } else {
-              mapRow.style.display = "none";
-            }
-          }
-
-          if (window.userRole === "admin") {
-            var edit = document.getElementById("editLink");
-            if (edit) {
-              edit.style.display = "";
-              edit.href = "edit-plant.html?id=" + encodeURIComponent(id);
-            }
-          }
+          renderPlant(p, id);
+          try { sessionStorage.removeItem("recentlyAddedPlant"); } catch (e) {}
         })
         .catch(function () {
+          var recent = getRecentlyAddedPlantFor(id);
+          if (recent) {
+            renderPlant(recent, id);
+            return;
+          }
           showError();
         });
     })();

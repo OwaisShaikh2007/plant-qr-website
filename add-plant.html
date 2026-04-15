@@ -307,12 +307,16 @@
           body: JSON.stringify(body)
         }).then(function (r) {
           return toJsonOrThrow(r, "Failed to add plant");
-        }).then(function () {
+        }).then(function (createdPlant) {
             try {
               localStorage.setItem("plantQrCloudLinks", JSON.stringify({
                 basicHtmlLink: body.basicHtmlLink || "",
                 detailedHtmlLink: body.detailedHtmlLink || ""
               }));
+            } catch (_) {}
+            try {
+              // Keep a short-lived copy so details page can render immediately after add.
+              sessionStorage.setItem("recentlyAddedPlant", JSON.stringify(createdPlant || body || {}));
             } catch (_) {}
             savedLinksList.innerHTML = "";
             [
@@ -336,7 +340,13 @@
             }
             savedLinksPreview.style.display = "block";
             alert("Plant saved successfully.");
-            setTimeout(function () { window.location.href = "plants.html"; }, 1200);
+            setTimeout(function () {
+              if (createdPlant && createdPlant.id) {
+                window.location.href = "plant-details.html?id=" + encodeURIComponent(createdPlant.id);
+              } else {
+                window.location.href = "plants.html";
+              }
+            }, 1200);
         }).catch(function (err) {
           btn.disabled = false;
           btn.textContent = "Save Plant";
