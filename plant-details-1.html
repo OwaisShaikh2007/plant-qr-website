@@ -51,7 +51,7 @@
               </div>
               <div class="info-section">
                 <div class="info-row"><span class="info-label">Location:</span><span class="info-value">COLLEGE CAMPUS</span></div>
-                <div class="info-row"><span class="info-label">🌍 Coordinates:</span><span class="info-value">—</span></div>
+                <div class="info-row"><span class="info-label">🌍 Coordinates:</span><span class="info-value">16.9839498, 73.3123325</span></div>
                 <div class="info-row"><span class="info-label">🎂 Age:</span><span class="info-value">6 years (bearing stage)</span></div>
                 <div class="info-row"><span class="info-label">Date Added:</span><span class="info-value">2026-03-05</span></div>
                 <div class="info-row" id="mapLinkRow" style="display:none;">
@@ -88,8 +88,30 @@
   <script src="auth.js"></script>
   <script>
     (function () {
-      var API = "https://plant-qr-website-production.up.railway.app";
+      var API_BASES = [
+        "https://plant-qr-website-production-e8fa.up.railway.app",
+        "https://plant-qr-website-production.up.railway.app"
+      ];
       var PLANT_ID = 1;
+      function fetchPlantWithFallback() {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Could not load plant.");
+          return fetch(API_BASES[index] + "/api/plants/" + PLANT_ID)
+            .then(function (r) {
+              if (r.status === 404) return tryAt(index + 1);
+              return r.text().then(function (text) {
+                var data = {};
+                try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+                if (!r.ok || !data || data.error) throw new Error("Could not load plant.");
+                return data;
+              });
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
+        }
+        return tryAt(0);
+      }
 
       function setText(selector, value) {
         if (!value) return;
@@ -111,8 +133,7 @@
         }
       }
 
-      fetch(API + "/api/plants/" + PLANT_ID)
-        .then(function (r) { return r.json(); })
+      fetchPlantWithFallback()
         .then(function (p) {
           if (!p || p.error) return;
           setText(".plant-details .page-header h1", p.name || "Mango Tree");
