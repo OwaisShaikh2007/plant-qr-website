@@ -74,16 +74,31 @@
   <script>
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
-      var API_BASE = "https://plant-qr-website-production.up.railway.app";
-      function toJsonOrThrow(r) {
-        if (!r.ok) {
-          return r.json().then(function (d) {
-            throw new Error((d && d.error) || "Request failed.");
-          }).catch(function () {
-            throw new Error("Request failed.");
-          });
+      var API_BASES = [
+        "https://plant-qr-website-production.up.railway.app",
+        "https://plant-qr-website-production-e8fa.up.railway.app"
+      ];
+      function fetchWithFallback(path, options) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Could not reach server. Please try again.");
+          return fetch(API_BASES[index] + path, options || {})
+            .then(function (r) {
+              if (r.status === 404) return tryAt(index + 1);
+              return r;
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
         }
-        return r.json();
+        return tryAt(0);
+      }
+      function toJsonOrThrow(r) {
+        return r.text().then(function (text) {
+          var data = {};
+          try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+          if (!r.ok) throw new Error((data && data.error) || "Request failed.");
+          return data;
+        });
       }
       function loadReplies() {
         var email = document.getElementById("fbEmail").value.trim();
@@ -92,10 +107,10 @@
           document.getElementById("repliesList").innerHTML = "<p style=\"color:#666;\">Enter your email or phone to see admin replies.</p>";
           return;
         }
-        var url = API_BASE + "/api/my-messages?type=feedback";
+        var url = "/api/my-messages?type=feedback";
         if (email) url += "&email=" + encodeURIComponent(email);
         if (phone) url += "&phone=" + encodeURIComponent(phone);
-        fetch(url)
+        fetchWithFallback(url)
           .then(toJsonOrThrow)
           .then(function (data) {
             var replies = (data || []).filter(function (m) { return m.adminReply; });
@@ -113,8 +128,8 @@
                 "</div>";
             }).join("");
           })
-          .catch(function () {
-            document.getElementById("repliesList").innerHTML = "<p style=\"color:#e74c3c;\">Could not load replies.</p>";
+          .catch(function (err) {
+            document.getElementById("repliesList").innerHTML = "<p style=\"color:#e74c3c;\">" + escapeHtml((err && err.message) || "Could not load replies.") + "</p>";
           });
       }
 
@@ -137,7 +152,7 @@
         var msgEl = document.getElementById("feedbackMsg");
         var btn = this.querySelector('button[type="submit"]');
         btn.disabled = true;
-        fetch(API_BASE + "/api/feedback", {
+        fetchWithFallback("/api/feedback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
