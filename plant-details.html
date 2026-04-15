@@ -132,6 +132,26 @@
           return data;
         });
       }
+      function fetchPlantByIdWithFallback(id) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Could not load plant.");
+          return fetch(API_BASES[index] + "/api/plants/" + id)
+            .then(function (r) {
+              if (r.status === 404) return tryAt(index + 1);
+              return toJsonOrThrow(r).then(function (data) {
+                // Some hosts may return non-API HTML/empty JSON with 200; treat as invalid and fallback.
+                if (!data || typeof data !== "object" || data.error || !data.id) {
+                  return tryAt(index + 1);
+                }
+                return data;
+              });
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
+        }
+        return tryAt(0);
+      }
       function getPlantId() {
         var params = new URLSearchParams(window.location.search || "");
         var id = parseInt(params.get("id"), 10);
@@ -151,8 +171,7 @@
         return;
       }
 
-      fetchWithFallback("/api/plants/" + id)
-        .then(toJsonOrThrow)
+      fetchPlantByIdWithFallback(id)
         .then(function (p) {
           if (!p || p.error) {
             showError();
