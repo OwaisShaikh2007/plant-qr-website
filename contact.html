@@ -86,8 +86,8 @@
     (function () {
       if (window.userRole === "admin") { window.location.href = "dashboard.html"; return; }
       var API_BASES = [
-        "https://plant-qr-website-production.up.railway.app",
-        "https://plant-qr-website-production-e8fa.up.railway.app"
+        "https://plant-qr-website-production-e8fa.up.railway.app",
+        "https://plant-qr-website-production.up.railway.app"
       ];
       function fetchWithFallback(path, options) {
         function tryAt(index) {
