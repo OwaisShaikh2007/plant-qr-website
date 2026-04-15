@@ -1,6 +1,9 @@
 // User signup logic for Plant QR
 (function () {
-  var API_URL = "https://plant-qr-website-production.up.railway.app";
+  var API_URLS = [
+    "https://plant-qr-website-production.up.railway.app",
+    "https://plant-qr-website-production-e8fa.up.railway.app"
+  ];
 
   function get(id) {
     return document.getElementById(id);
@@ -20,6 +23,28 @@
 
   var form = get("signupForm");
   if (!form) return;
+
+  function postJsonWithFallback(path, body) {
+    function tryAt(index) {
+      if (index >= API_URLS.length) {
+        throw new Error("Could not reach server. Please try again.");
+      }
+      return fetch(API_URLS[index] + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (data) {
+            return { ok: r.ok, data: data };
+          });
+        })
+        .catch(function () {
+          return tryAt(index + 1);
+        });
+    }
+    return tryAt(0);
+  }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -54,17 +79,12 @@
       btn.textContent = "Signing up…";
     }
 
-    fetch(API_URL + "/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        phone: phone,
-        password: password
-      })
+    postJsonWithFallback("/api/signup", {
+      name: name,
+      email: email,
+      phone: phone,
+      password: password
     })
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
       .then(function (res) {
         if (!res.ok || res.data.error) {
           showError(res.data.error || "Failed to sign up. Please try again.");
@@ -85,8 +105,8 @@
         } catch (e) {}
         window.location.href = "dashboard.html";
       })
-      .catch(function () {
-        showError("Could not reach server. Please try again.");
+      .catch(function (err) {
+        showError((err && err.message) || "Could not reach server. Please try again.");
         if (btn) {
           btn.disabled = false;
           btn.textContent = "Sign Up";

@@ -105,7 +105,19 @@
         return;
       }
 
-      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      var API_BASES = [
+        "https://plant-qr-website-production.up.railway.app",
+        "https://plant-qr-website-production-e8fa.up.railway.app"
+      ];
+      function fetchWithFallback(path, options) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Request failed.");
+          return fetch(API_BASES[index] + path, options || {}).catch(function () {
+            return tryAt(index + 1);
+          });
+        }
+        return tryAt(0);
+      }
       function toJsonOrThrow(r) {
         if (!r.ok) {
           return r.json().then(function (d) {
@@ -212,14 +224,14 @@
       }
 
       function loadMessages() {
-        fetch(API_BASE + "/api/messages")
+        fetchWithFallback("/api/messages")
           .then(toJsonOrThrow)
           .then(function (data) {
             messages = data || [];
             filterMessages();
           })
           .catch(function () {
-            document.getElementById("messagesList").innerHTML = "<p class=\"text-center\" style=\"color:#e74c3c;\">Could not load messages. Is the server running?</p>";
+            document.getElementById("messagesList").innerHTML = "<p class=\"text-center\" style=\"color:#e74c3c;\">Could not load messages right now. Please try again.</p>";
           });
       }
 
@@ -239,6 +251,7 @@
 
         document.getElementById("replyMessageId").value = messageId;
         document.getElementById("replyText").value = "";
+        document.getElementById("replyText").readOnly = false;
         document.getElementById("replyMsg").style.display = "none";
         document.getElementById("replyModal").style.display = "flex";
       };
@@ -274,7 +287,7 @@
         }
 
         btn.disabled = true;
-        fetch(API_BASE + "/api/messages/" + messageId + "/reply", {
+        fetchWithFallback("/api/messages/" + messageId + "/reply", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ reply: replyText })
