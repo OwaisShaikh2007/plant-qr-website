@@ -67,7 +67,19 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      var API_BASES = [
+        "https://plant-qr-website-production.up.railway.app",
+        "https://plant-qr-website-production-e8fa.up.railway.app"
+      ];
+      function fetchWithFallback(path, options) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Request failed.");
+          return fetch(API_BASES[index] + path, options || {}).catch(function () {
+            return tryAt(index + 1);
+          });
+        }
+        return tryAt(0);
+      }
       function toJsonOrThrow(r) {
         if (!r.ok) {
           return r.json().then(function (d) {
@@ -107,7 +119,7 @@
         }).join("");
       }
 
-      fetch(API_BASE + "/api/users")
+      fetchWithFallback("/api/users")
         .then(toJsonOrThrow)
         .then(function (list) {
           usersList = Array.isArray(list) ? list : [];
@@ -160,7 +172,7 @@
 
         btn.disabled = true;
 
-        fetch(API_BASE + "/api/users", {
+        fetchWithFallback("/api/users", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

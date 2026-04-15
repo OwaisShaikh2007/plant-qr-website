@@ -153,12 +153,25 @@
       }
 
       if (!isAdmin) {
-        var API_BASE = "https://plant-qr-website-production.up.railway.app";
-        fetch(API_BASE + "/api/plants")
-          .then(function (r) {
-            if (!r.ok) throw new Error("Could not load plants.");
-            return r.json();
-          })
+        var API_BASES = [
+          "https://plant-qr-website-production.up.railway.app",
+          "https://plant-qr-website-production-e8fa.up.railway.app"
+        ];
+        function fetchJsonWithFallback(path) {
+          function tryAt(index) {
+            if (index >= API_BASES.length) throw new Error("Could not load plants.");
+            return fetch(API_BASES[index] + path)
+              .then(function (r) {
+                if (!r.ok) throw new Error("Could not load plants.");
+                return r.json();
+              })
+              .catch(function () {
+                return tryAt(index + 1);
+              });
+          }
+          return tryAt(0);
+        }
+        fetchJsonWithFallback("/api/plants")
           .then(function (list) {
             if (!Array.isArray(list)) return;
             var sorted = list.slice().sort(function (a, b) {

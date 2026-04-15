@@ -1,7 +1,9 @@
 // User password login logic for Plant QR
 (function () {
-  // Use the same backend URL as admin login so this works from GitHub Pages / any host
-  var API_URL = "https://plant-qr-website-production.up.railway.app";
+  var API_URLS = [
+    "https://plant-qr-website-production.up.railway.app",
+    "https://plant-qr-website-production-e8fa.up.railway.app"
+  ];
 
   function get(id) {
     return document.getElementById(id);
@@ -22,6 +24,28 @@
   var form = get("userLoginForm");
   if (!form) return;
 
+  function postJsonWithFallback(path, body) {
+    function tryAt(index) {
+      if (index >= API_URLS.length) {
+        throw new Error("Could not reach server. Please try again.");
+      }
+      return fetch(API_URLS[index] + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (data) {
+            return { ok: r.ok, data: data };
+          });
+        })
+        .catch(function () {
+          return tryAt(index + 1);
+        });
+    }
+    return tryAt(0);
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     clearError();
@@ -41,18 +65,13 @@
     var btn = form.querySelector('button[type="submit"]');
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Signing in?";
+      btn.textContent = "Signing in…";
     }
 
-    fetch(API_URL + "/api/login-user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        emailOrPhone: emailOrPhone,
-        password: password
-      })
+    postJsonWithFallback("/api/login-user", {
+      emailOrPhone: emailOrPhone,
+      password: password
     })
-      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
       .then(function (res) {
         if (!res.ok || res.data.error) {
           showError(res.data.error || "Sign in failed. Please try again.");
@@ -74,8 +93,8 @@
         } catch (e) {}
         window.location.href = "dashboard.html";
       })
-      .catch(function () {
-        showError("Could not reach server. Please try again.");
+      .catch(function (err) {
+        showError((err && err.message) || "Could not reach server. Please try again.");
         if (btn) {
           btn.disabled = false;
           btn.textContent = "Sign In";

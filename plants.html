@@ -61,7 +61,25 @@
   <script>
     (function () {
       var isAdmin = window.userRole === "admin";
-      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      var API_BASES = [
+        "https://plant-qr-website-production.up.railway.app",
+        "https://plant-qr-website-production-e8fa.up.railway.app"
+      ];
+
+      function fetchJsonWithFallback(path, options) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Could not load plants.");
+          return fetch(API_BASES[index] + path, options || {})
+            .then(function (r) {
+              if (!r.ok) throw new Error("Could not load plants.");
+              return r.json();
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
+        }
+        return tryAt(0);
+      }
 
       function getDetailsPage(id) {
         var num = parseInt(id, 10);
@@ -106,22 +124,14 @@
             var id = btn.getAttribute("data-id");
             var name = btn.getAttribute("data-name");
             if (!confirm("Remove tree \"" + name + "\"? This cannot be undone.")) return;
-            fetch(API_BASE + "/api/plants/" + id, { method: "DELETE" })
-              .then(function (r) {
-                if (!r.ok) throw new Error("Failed to remove plant.");
-                return r.json();
-              })
+            fetchJsonWithFallback("/api/plants/" + id, { method: "DELETE" })
               .then(function () { load(); })
               .catch(function () { alert("Failed to remove. Is the server running?"); });
           });
         });
       }
       function load() {
-        fetch(API_BASE + "/api/plants")
-          .then(function (r) {
-            if (!r.ok) throw new Error("Could not load plants.");
-            return r.json();
-          })
+        fetchJsonWithFallback("/api/plants")
           .then(render)
           .catch(function () {
             document.getElementById("plantsGrid").innerHTML = "<p class=\"no-results\" style=\"grid-column:1/-1;\">Could not load plants. Start the server: npm start</p>";
