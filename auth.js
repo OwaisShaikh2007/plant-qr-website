@@ -6,6 +6,48 @@
   var joinedDate = (sessionStorage && sessionStorage.getItem("userJoinedDate")) || "";
   var lastLogin = (sessionStorage && sessionStorage.getItem("userLastLogin")) || "";
 
+  function cleanPhone(v) {
+    return String(v || "").replace(/\D/g, "");
+  }
+  function getAccountDateKey() {
+    return "plantQrAccountDates::" + [
+      role || "",
+      String(email || "").trim().toLowerCase(),
+      cleanPhone(phone),
+      String(name || "").trim().toLowerCase()
+    ].join("|");
+  }
+  function loadStoredDates() {
+    try {
+      var raw = localStorage.getItem(getAccountDateKey());
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function saveStoredDates(dates) {
+    try {
+      localStorage.setItem(getAccountDateKey(), JSON.stringify(dates || {}));
+    } catch (e) {}
+  }
+
+  // Backfill session dates from persistent profile dates if backend response omitted them.
+  var storedDates = loadStoredDates() || {};
+  if (!joinedDate && storedDates.joinedDate) joinedDate = storedDates.joinedDate;
+  if (!lastLogin && storedDates.lastLogin) lastLogin = storedDates.lastLogin;
+  if (joinedDate || lastLogin) {
+    try {
+      if (joinedDate) sessionStorage.setItem("userJoinedDate", joinedDate);
+      if (lastLogin) sessionStorage.setItem("userLastLogin", lastLogin);
+    } catch (e) {}
+  }
+  if (joinedDate || lastLogin) {
+    saveStoredDates({
+      joinedDate: joinedDate || "",
+      lastLogin: lastLogin || ""
+    });
+  }
+
   window.userRole = role;
   window.userName = name;
   window.userEmail = email;

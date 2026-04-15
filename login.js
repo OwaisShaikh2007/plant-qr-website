@@ -58,6 +58,26 @@
     }
     return tryAt(0);
   }
+  function cleanPhone(v) {
+    return String(v || "").replace(/\D/g, "");
+  }
+  function saveAccountDates(role, name, email, phone, joinedDate, lastLogin) {
+    var key = "plantQrAccountDates::" + [
+      role || "",
+      String(email || "").trim().toLowerCase(),
+      cleanPhone(phone),
+      String(name || "").trim().toLowerCase()
+    ].join("|");
+    try {
+      var prev = {};
+      var raw = localStorage.getItem(key);
+      if (raw) prev = JSON.parse(raw) || {};
+      localStorage.setItem(key, JSON.stringify({
+        joinedDate: joinedDate || prev.joinedDate || "",
+        lastLogin: lastLogin || prev.lastLogin || ""
+      }));
+    } catch (e) {}
+  }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -102,14 +122,32 @@
         }
 
         var a = res.data.admin || {};
+        var nowIso = new Date().toISOString();
+        var finalName = a.name || "Admin User";
+        var finalEmail = a.email || email;
+        var finalPhone = a.phone || "";
+        var key = "plantQrAccountDates::" + [
+          "admin",
+          String(finalEmail).trim().toLowerCase(),
+          cleanPhone(finalPhone),
+          String(finalName).trim().toLowerCase()
+        ].join("|");
+        var prev = {};
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw) prev = JSON.parse(raw) || {};
+        } catch (e) {}
+        var finalJoined = a.dateAdded || a.createdAt || prev.joinedDate || nowIso;
+        var finalLastLogin = a.lastLogin || nowIso;
         try {
           sessionStorage.setItem("userRole", "admin");
-          sessionStorage.setItem("userName", a.name || "Admin User");
-          sessionStorage.setItem("userEmail", a.email || email);
-          sessionStorage.setItem("userPhone", a.phone || "");
-          sessionStorage.setItem("userJoinedDate", a.dateAdded || a.createdAt || "");
-          sessionStorage.setItem("userLastLogin", a.lastLogin || "");
+          sessionStorage.setItem("userName", finalName);
+          sessionStorage.setItem("userEmail", finalEmail);
+          sessionStorage.setItem("userPhone", finalPhone);
+          sessionStorage.setItem("userJoinedDate", finalJoined);
+          sessionStorage.setItem("userLastLogin", finalLastLogin);
         } catch (e) {}
+        saveAccountDates("admin", finalName, finalEmail, finalPhone, finalJoined, finalLastLogin);
 
         window.location.href = "dashboard.html";
       })

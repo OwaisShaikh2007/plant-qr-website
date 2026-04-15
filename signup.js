@@ -51,6 +51,26 @@
     }
     return tryAt(0);
   }
+  function cleanPhone(v) {
+    return String(v || "").replace(/\D/g, "");
+  }
+  function saveAccountDates(role, name, email, phone, joinedDate, lastLogin) {
+    var key = "plantQrAccountDates::" + [
+      role || "",
+      String(email || "").trim().toLowerCase(),
+      cleanPhone(phone),
+      String(name || "").trim().toLowerCase()
+    ].join("|");
+    try {
+      var prev = {};
+      var raw = localStorage.getItem(key);
+      if (raw) prev = JSON.parse(raw) || {};
+      localStorage.setItem(key, JSON.stringify({
+        joinedDate: joinedDate || prev.joinedDate || "",
+        lastLogin: lastLogin || prev.lastLogin || ""
+      }));
+    } catch (e) {}
+  }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -101,14 +121,21 @@
           return;
         }
         var u = res.data.user || {};
+        var nowIso = new Date().toISOString();
+        var finalName = u.name || name;
+        var finalEmail = u.email || email;
+        var finalPhone = u.phone || phone;
+        var finalJoined = u.dateAdded || u.createdAt || nowIso;
+        var finalLastLogin = u.lastLogin || nowIso;
         try {
           sessionStorage.setItem("userRole", "user");
-          sessionStorage.setItem("userName", u.name || name);
-          sessionStorage.setItem("userEmail", u.email || email);
-          sessionStorage.setItem("userPhone", u.phone || phone);
-          sessionStorage.setItem("userJoinedDate", u.dateAdded || u.createdAt || "");
-          sessionStorage.setItem("userLastLogin", u.lastLogin || "");
+          sessionStorage.setItem("userName", finalName);
+          sessionStorage.setItem("userEmail", finalEmail);
+          sessionStorage.setItem("userPhone", finalPhone);
+          sessionStorage.setItem("userJoinedDate", finalJoined);
+          sessionStorage.setItem("userLastLogin", finalLastLogin);
         } catch (e) {}
+        saveAccountDates("user", finalName, finalEmail, finalPhone, finalJoined, finalLastLogin);
         window.location.href = "dashboard.html";
       })
       .catch(function (err) {

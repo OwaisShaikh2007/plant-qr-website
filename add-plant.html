@@ -146,7 +146,32 @@
   <script>
     (function () {
       if (window.userRole !== "admin") { window.location.href = "dashboard.html"; return; }
-      var API_BASE = "https://plant-qr-website-production.up.railway.app";
+      var API_BASES = [
+        "https://plant-qr-website-production-e8fa.up.railway.app",
+        "https://plant-qr-website-production.up.railway.app"
+      ];
+      function fetchWithFallback(path, options) {
+        function tryAt(index) {
+          if (index >= API_BASES.length) throw new Error("Could not reach server. Please try again.");
+          return fetch(API_BASES[index] + path, options || {})
+            .then(function (r) {
+              if (r.status === 404) return tryAt(index + 1);
+              return r;
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
+        }
+        return tryAt(0);
+      }
+      function toJsonOrThrow(r, defaultMsg) {
+        return r.text().then(function (text) {
+          var data = {};
+          try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+          if (!r.ok) throw new Error((data && data.error) || defaultMsg || "Request failed.");
+          return data;
+        });
+      }
       var form = document.getElementById("addPlantForm");
       var stepBasicInfo = document.getElementById("stepBasicInfo");
       var stepCloudSaving = document.getElementById("stepCloudSaving");
@@ -276,19 +301,13 @@
         var btn = form.querySelector('button[type="submit"]');
         btn.disabled = true;
         btn.textContent = "Adding…";
-        fetch(API_BASE + "/api/plants", {
+        fetchWithFallback("/api/plants", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         }).then(function (r) {
-          if (!r.ok) {
-            return r.json().then(function (d) {
-              throw new Error((d && d.error) || "Failed to add plant");
-            }).catch(function () {
-              throw new Error("Failed to add plant");
-            });
-          }
-          if (r.ok) {
+          return toJsonOrThrow(r, "Failed to add plant");
+        }).then(function () {
             try {
               localStorage.setItem("plantQrCloudLinks", JSON.stringify({
                 basicHtmlLink: body.basicHtmlLink || "",
@@ -318,12 +337,10 @@
             savedLinksPreview.style.display = "block";
             alert("Plant saved successfully.");
             setTimeout(function () { window.location.href = "plants.html"; }, 1200);
-            return;
-          }
         }).catch(function (err) {
           btn.disabled = false;
           btn.textContent = "Save Plant";
-          alert(err.message || "Failed to add plant. Is the server running?");
+          alert((err && err.message) || "Failed to add plant.");
         });
       });
     })();
