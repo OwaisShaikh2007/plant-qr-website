@@ -111,22 +111,28 @@
       ];
       function fetchWithFallback(path, options) {
         function tryAt(index) {
-          if (index >= API_BASES.length) throw new Error("Request failed.");
-          return fetch(API_BASES[index] + path, options || {}).catch(function () {
-            return tryAt(index + 1);
-          });
+          if (index >= API_BASES.length) throw new Error("Could not connect to message service.");
+          return fetch(API_BASES[index] + path, options || {})
+            .then(function (r) {
+              // If this deployment doesn't have the route, try the next base URL.
+              if (r.status === 404) return tryAt(index + 1);
+              return r;
+            })
+            .catch(function () {
+              return tryAt(index + 1);
+            });
         }
         return tryAt(0);
       }
       function toJsonOrThrow(r) {
-        if (!r.ok) {
-          return r.json().then(function (d) {
-            throw new Error((d && d.error) || "Request failed.");
-          }).catch(function () {
-            throw new Error("Request failed.");
-          });
-        }
-        return r.json();
+        return r.text().then(function (text) {
+          var data = {};
+          try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+          if (!r.ok) {
+            throw new Error((data && data.error) || "Request could not be completed.");
+          }
+          return data;
+        });
       }
       var messages = [];
       var filteredMessages = [];
@@ -230,8 +236,8 @@
             messages = data || [];
             filterMessages();
           })
-          .catch(function () {
-            document.getElementById("messagesList").innerHTML = "<p class=\"text-center\" style=\"color:#e74c3c;\">Could not load messages right now. Please try again.</p>";
+          .catch(function (err) {
+            document.getElementById("messagesList").innerHTML = "<p class=\"text-center\" style=\"color:#e74c3c;\">" + escapeHtml((err && err.message) || "Could not load messages right now. Please try again.") + "</p>";
           });
       }
 
@@ -306,7 +312,7 @@
           .catch(function (err) {
             msgEl.style.display = "block";
             msgEl.className = "error-message";
-            msgEl.textContent = err.message || "Could not send reply.";
+            msgEl.textContent = (err && err.message) || "Could not send reply right now.";
             btn.disabled = false;
           });
       });

@@ -35,8 +35,14 @@
         body: JSON.stringify(body)
       })
         .then(function (r) {
-          return r.json().catch(function () { return {}; }).then(function (data) {
-            return { ok: r.ok, data: data };
+          // Some deployments can return HTML on 404; treat that as a retryable endpoint miss.
+          if (r.status === 404) {
+            return tryAt(index + 1);
+          }
+          return r.text().then(function (text) {
+            var data = {};
+            try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+            return { ok: r.ok, status: r.status, data: data };
           });
         })
         .catch(function () {
@@ -87,7 +93,7 @@
     })
       .then(function (res) {
         if (!res.ok || res.data.error) {
-          showError(res.data.error || "Failed to sign up. Please try again.");
+          showError(res.data.error || ("Failed to sign up. (HTTP " + (res.status || "error") + ")"));
           if (btn) {
             btn.disabled = false;
             btn.textContent = "Sign Up";
